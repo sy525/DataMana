@@ -4,6 +4,8 @@
 *Revised: spring 2019 September 15
 *----------------------------
 
+//great descriptions/comments and some fancy stuff, but doesnt do what ps1 asks for--save in 3 different formats!
+//pls read instructions carefully and ask if in doubt
 
 //---------------------------data mgmt----------------------------------------------
 //---------------------------data mgmt----------------------------------------------
