@@ -3,9 +3,13 @@
 *Revised: spring 2019 Oct.10
 *----------------------------
 
+//good preamble
+
 //---------------------------data mgmt----------------------------------------------
 //---------------------------data mgmt----------------------------------------------
 //---------------------------data mgmt----------------------------------------------
+
+//very nice desscr here
 
 /* Data Description 
 The data are from Chinese Longitudinal Healthy Longevity Survey (CLHLS).It provides information 
@@ -16,13 +20,15 @@ the oldest population, including centenarian and nonagenarian; the CLHLS provide
 socioeconomic characteristics, family, lifestyle, and demographic profile of this aged population.  
 */
 
+
+//great you continue with research started earlier! very good topic and interesting dataset
 /* Research Goal
 This research is on health disparity for Chinese elderly. This research would like to find out how geographic and ethinicity
 of residents impact on health quality of old people in China.  
 */
 
 *----------------------------
-
+//both are CLHLS--can you find some other data to merge? say some data from chinese census and merge on urbanicity?
 * the second data set.
 use "https://docs.google.com/uc?id=1_exDjt1Rbc1B18wX0oMgyRZeWpm04uKH&export=download",clear
 keep in 1/100
@@ -41,7 +47,7 @@ save eld2.dta, replace
 use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
 keep in 1/100
 save eld1.dta,replace
-
+//you are alreaady quite advanced so possibly can just go with full dataset
 
 // manipulate the data 
 use eld1,clear
@@ -88,7 +94,7 @@ the life expectancy of the elderly in different geographic locations. No doubt, 
 tells us that the mean of age in city is biggest, compared to town and rural area*/
 list  /*list the result*/
 
-
+//would be nice oif you can proiduce variables that you will actually use in analysis later
 /*by: egen*/
 bys rural14: egen medage=median(age14)
 la var medage "median elderly age"
