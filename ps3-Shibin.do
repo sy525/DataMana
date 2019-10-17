@@ -142,8 +142,8 @@ can help us easier to compare the data, especially a large dataset. */
 
 /*merge2*/
 use eld2.dta,clear
-drop ID age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
-merge 1:1 PROV using eld1.dta
+drop  age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
+merge 1:1 ID using eld1.dta, nogen
 save merge2.dta,replace
 
 /*merge3*/
@@ -151,7 +151,8 @@ use "https://docs.google.com/uc?id=1r0brtgXRy0r39L6p1TOUimh8ULZGJIb2&export=down
 recode PBIRTH (5=0) (1 2 3 4=1) (-99=.)
 label define rural 0 Urban 1 Rural
 label list rural
-merge 1:1 rural using merge2.dta
+merge 1:1 ID using merge2.dta, nogen
+save merge3.dta,replace
 
 
 /*merge4*/
@@ -159,15 +160,24 @@ use "https://docs.google.com/uc?id=1T87WO8AvWbsfkekR3H0NIeQRhmzHN3aG&export=down
 rename S104 marital
 save data1,replace
 use merge1.dta, clear
-reshape long marital, i(ID) j(year)
-merge 1:1 marital using merge1.dta
+*reshape long marital, i(ID) j(year)
+merge 1:1 ID using merge1.dta, nogen
+save merge4.dta,replace
 
 /*merge5*/
-use "https://docs.google.com/uc?id=1VUVzHvdI3EdYKcOHc07CIfedQ6KWjbT7&export=download",clear
+use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+decode PROV, gen(PROV1)
+replace PROV1 = proper(PROV1)
+save merge5,replace
+import excel "https://docs.google.com/uc?id=1X9vOTsmzC43fwj-IoRzHVFy6FWkKx-WA&export=download", sheet("Sheet1") firstrow clear
+keep in 1/31
+save prov1,replace
+use merge5
+merge m:1 PROV1 using prov1, nogen 
 
 
 
-
+ 
 
 
 
