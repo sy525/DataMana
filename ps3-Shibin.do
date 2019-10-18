@@ -33,6 +33,10 @@ people in China. In other words, this study will assess the impact of geographic
 and ethnicity disparity on the health outcome of the Chinese elderly.
 */
 
+//great!
+//need to specify exactly where the data come from, ie give URL AND most importanlt merge with data from other sources!
+//and specify these other datasets in detail as well!
+
 *----------------------------
 
 * the second data set--the using dataset which are used to merge.
@@ -91,6 +95,7 @@ recode marital14 (3 4 5=0) (1=1), gen(spouse14)
 * recode the marital variables. Make the elderly living with spouse code as 1 and the one living alone 0. 
 tab spouse14
 
+//want to save it here, otherwise loosing the work you did above!
 
 /*collapse*/
 use eld1.dta, clear
