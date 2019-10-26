@@ -45,7 +45,7 @@ Hypothesis 3: The Han (majority) elderly living in a rural area have a better he
 Hypothesis 4: The minorities elderly living in an urban area have a better health status than those in a rural area.
 */
 
-
+//very nice! good job!
 
 *----------------------------PS4
 //make the data use easier
@@ -71,6 +71,10 @@ recode ethnic14  (1=0) (2 3 4 5 6 7 8=1)
 la de ethniclab 0 "majority" 1 "minority"
 la val ethnic14 ethniclab
 label list ethniclab
+
+//may want to save this! you do all this work and then it gets lost: when you do graphs and visuzalizations later, 
+//its much better to start with clean labelled data than just run everything from scratch again 
+
 tab ethnic14
 * Start to visualize the data 
 *Basic descriptive statistic 
@@ -197,7 +201,7 @@ tab meanage14 ethnic14
 
 
 *----------------------------PS3
-/*merge1*/
+/*merge1*/ 
 sort ID
 merge 1:1 ID using eld2.dta
 * the result shows that 53 data are successful merged.
@@ -267,9 +271,42 @@ list PROV RESIDENC V_BTHMON if _merge==1 | _merge==2
 the reason for the non-merge is because there is different way to spell the name of
  province name between the master dataset and using dataset, such as Shannxi and 
  Shaanxi.
+ 
+ yes! but its easy to fix, just replace it with what it is in the other dataset before merging!
+and there seems to be one more H something; and better to tab than list:
+. ta PROV if _merge==1
+
+          PROV |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+         Gansu |          1       10.00       10.00
+       Guizhou |          1       10.00       20.00
+  Heilongjiang |          1       10.00       30.00
+Inner Mongolia |          1       10.00       40.00
+       Ningxia |          1       10.00       50.00
+       Qinghai |          1       10.00       60.00
+       Shannxi |          1       10.00       70.00
+         Tibet |          1       10.00       80.00
+      Xinjiang |          1       10.00       90.00
+        Yunnan |          1       10.00      100.00
+---------------+-----------------------------------
+         Total |         10      100.00
+
+. ta PROV if _merge==2
+
+          PROV |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+   Helongjiang |         79       50.32       50.32
+       Shaanxi |         78       49.68      100.00
+---------------+-----------------------------------
+         Total |        157      100.00
+
+
+ 
 */
 * Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
 
+//and then need to save AND merge with everything else! that's the goal of all of this--not just to merge for the sake of exercise
+//but to merge so that we build a new big dataset that has everything in it!
 
 /*merge7*/
 use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
