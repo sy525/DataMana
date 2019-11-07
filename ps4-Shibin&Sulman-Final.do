@@ -460,7 +460,7 @@ symplot age14
 symplot income14
 graph matrix health14 age14, by(ethnic14, total)
 qnorm age14, grid
-tab A2 , sum (TRUEAGE)
+*tab A2 , sum (TRUEAGE)
 graph matrix health14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 
 
