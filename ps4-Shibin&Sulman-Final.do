@@ -383,7 +383,7 @@ reg health14 happiness14
 reg health14 income14 
 reg health14 income14 education14 employment14
 reg health14 income14 education14 employment14 age14
-reg health14 income14 education14 employment14 age14 "`control'"
+*reg health14 income14 education14 employment14 age14 "`control'"
 
 reg health14 happiness14 `control'  // Problem?
 reg happiness14 ethnic14 rural14 
