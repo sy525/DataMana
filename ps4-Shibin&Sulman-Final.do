@@ -195,7 +195,6 @@ The reshape can help us easier to compare the data, especially a large dataset. 
 /********************/
 
 /*by: egen*/
-use eld1.dta, clear
 bys rural14: egen medage=median(age14)
 * creat the median age variable, so we can know the median age in different areas.
 la var medage "median elderly age"
