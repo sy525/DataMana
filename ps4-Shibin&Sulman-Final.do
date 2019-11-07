@@ -115,10 +115,10 @@ egen ADL1= rowmean (ADL toileting14)
 egen ADL2= rowmean (ADL1 transfer14)
 egen ADL3= rowmean (ADL2 continen14)
 sort ADL
-list ADL
+*list ADL
 egen IADL= rowmean (feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14)
 sort IADL
-list IADL
+*list IADL
 egen function14= rowmean (ADL3 IADL)
 
 * recode the rural variable
@@ -189,101 +189,6 @@ that elderly living in the city area will have a better life expectancy or healt
 counterpart in the rural area. These are several observations of data we found can support the hypothesis. 
 The reshape can help us easier to compare the data, especially a large dataset. */
 
-/*merge2*/
-use eld2.dta,clear
-drop  age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
-merge 1:1 ID using eld1.dta, nogen
-save merge2.dta,replace
-
-/*merge3*/
-use "https://docs.google.com/uc?id=1r0brtgXRy0r39L6p1TOUimh8ULZGJIb2&export=download",clear
-recode PBIRTH (5=0) (1 2 3 4=1) (-99=.)
-label define rural 0 Urban 1 Rural
-label list rural
-merge 1:1 ID using merge2.dta, nogen
-save merge3.dta,replace
-
-/*merge4*/
-use "https://docs.google.com/uc?id=1T87WO8AvWbsfkekR3H0NIeQRhmzHN3aG&export=download",clear
-rename S104 marital
-save data1,replace
-use merge1.dta, clear
-*reshape long marital, i(ID) j(year)
-merge 1:1 ID using merge1.dta, nogen
-save merge4.dta,replace
-
-/*merge5*/
-use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
-decode PROV, gen(PROV1)
-replace PROV1 = proper(PROV1)
-save merge2,replace
-import excel "https://docs.google.com/uc?id=1X9vOTsmzC43fwj-IoRzHVFy6FWkKx-WA&export=download", sheet("Sheet1") firstrow clear
-keep in 1/31
-save prov1,replace
-merge 1:m PROV1 using merge2, nogen 
-* Data from China Census 2010.
-
-/*merge6*/
-use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
-decode PROV, g(PROV1)
-replace PROV1 = proper(PROV1)
-drop PROV
-ren PROV1 PROV
-save merge6, replace
-import excel "https://docs.google.com/uc?id=14owWYRQ4O8GYwoN8VWVsyUyY1ke9KlwF&export=download", sheet("Sheet1") firstrow clear
-keep in 1/31
-save prov10,replace
-merge 1:m PROV using merge6 //, nogen 
-sort _merge
-list PROV if _merge==1
-list PROV if _merge==2
-list PROV RESIDENC V_BTHMON if _merge==1 | _merge==2
-/*
-the reason for the non-merge is because there is different way to spell the name of
- province name between the master dataset and using dataset, such as Shannxi and 
- Shaanxi.
-*/
-* Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
-
-//and then need to save AND merge with everything else! that's the goal of all of this--not just to merge for the sake of exercise
-//but to merge so that we build a new big dataset that has everything in it!
-
-/*merge7*/
-use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
-rename RESIDENC rural
-rename A43 Rural
-recode rural (3=0) (1 2=1) (-99=.)
-la de rurallab 0 "Rural" 1 "Urban"
-la val rural rurallab
-label list rurallab
-save merge10,replace
-use "https://docs.google.com/uc?id=1jrGlyM9tmOy9OtILTxuLnJhJuqgPdTvC&export=download",clear
-rename Q0104 rural
-rename Q0811 educ
-recode educ (-8=.)
-egen averural=mean(educ), by(rural)
-collapse educ, by(rural)
-save rural1,replace
-use merge10
-merge m:1 rural using rural1, nogen 
-* Data from WHO Study on Global AGEing and Adult Health 2007-2010 https://www.who.int/healthinfo/sage/en/.
-
- /*merge8*/
-use "https://docs.google.com/uc?id=1WMOXBRM8910rlTr3VV3uFCXPtuT5LRmC&export=download",clear
-keep if COUNTRY==1 | COUNTRY==10 | COUNTRY==22
-keep COUNTRY RESIDENCE PROVINCE_CHNS AGE INCOME PPP GOODHEALTH BMI
-ren PROVINCE_CHNS PROV
-decode PROV, gen(PROV1)
-replace PROV1 = proper(PROV1)
-save merge11,replace
-use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
-collapse (mean) TRUEAGE , by(PROV)
-decode PROV, gen(PROV1)
-replace PROV1 = proper(PROV1)
-merge 1:m PROV1 using merge11 
-/* A lot of non-merge happen in the using dataset because there are a lot of missing value of PROV1 variable in 
-the using dataset. Data from Research on Early Life and Aging Trends and Effects: A Cross-National Study 1996-2008 
-https://www.icpsr.umich.edu/icpsrweb/DSDR/studies/34241.*/
 
 /********************/
 /*descriptive statistics*/
