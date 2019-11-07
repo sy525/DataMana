@@ -109,16 +109,16 @@ rename E11 walking14
 rename E12 carrying14
 *E6 to E12 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
 
-* generate one depdendent variabel-functional capacity of the elderly
+* generate one depdendent variabel-
 egen ADL= rowmean (bathing14 dressing14)
 egen ADL1= rowmean (ADL toileting14)
 egen ADL2= rowmean (ADL1 transfer14)
 egen ADL3= rowmean (ADL2 continen14)
 sort ADL
-*list ADL
+list ADL
 egen IADL= rowmean (feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14)
 sort IADL
-*list IADL
+list IADL
 egen function14= rowmean (ADL3 IADL)
 
 * recode the rural variable
@@ -190,11 +190,108 @@ counterpart in the rural area. These are several observations of data we found c
 The reshape can help us easier to compare the data, especially a large dataset. */
 
 
+/*merge2*/
+use eld2.dta,clear
+drop  age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
+merge 1:1 ID using eld1.dta, force
+save merge2.dta,replace
+
+/*merge3*/
+use "https://docs.google.com/uc?id=1r0brtgXRy0r39L6p1TOUimh8ULZGJIb2&export=download",clear
+recode PBIRTH (5=0) (1 2 3 4=1) (-99=.)
+label define rural 0 Urban 1 Rural
+label list rural
+merge 1:1 ID using merge2.dta, nogen
+save merge3.dta,replace
+
+/*merge4*/
+use "https://docs.google.com/uc?id=1T87WO8AvWbsfkekR3H0NIeQRhmzHN3aG&export=download",clear
+rename S104 marital
+save data1,replace
+use merge1.dta, clear
+*reshape long marital, i(ID) j(year)
+merge 1:1 ID using merge1.dta, nogen
+save merge4.dta,replace
+
+/*merge5*/
+use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+decode PROV, gen(PROV1)
+replace PROV1 = proper(PROV1)
+save merge2,replace
+import excel "https://docs.google.com/uc?id=1X9vOTsmzC43fwj-IoRzHVFy6FWkKx-WA&export=download", sheet("Sheet1") firstrow clear
+keep in 1/31
+save prov1,replace
+merge 1:m PROV1 using merge2, nogen 
+* Data from China Census 2010.
+
+/*merge6*/
+use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+decode PROV, g(PROV1)
+replace PROV1 = proper(PROV1)
+drop PROV
+ren PROV1 PROV
+save merge6, replace
+import excel "https://docs.google.com/uc?id=14owWYRQ4O8GYwoN8VWVsyUyY1ke9KlwF&export=download", sheet("Sheet1") firstrow clear
+keep in 1/31
+save prov10,replace
+merge 1:m PROV using merge6 //, nogen 
+sort _merge
+list PROV if _merge==1
+list PROV if _merge==2
+list PROV RESIDENC V_BTHMON if _merge==1 | _merge==2
+/*
+the reason for the non-merge is because there is different way to spell the name of
+ province name between the master dataset and using dataset, such as Shannxi and 
+ Shaanxi.
+*/
+* Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
+
+//and then need to save AND merge with everything else! that's the goal of all of this--not just to merge for the sake of exercise
+//but to merge so that we build a new big dataset that has everything in it!
+
+/*merge7*/
+use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+rename RESIDENC rural
+rename A43 Rural
+recode rural (3=0) (1 2=1) (-99=.)
+la de rurallab 0 "Rural" 1 "Urban"
+la val rural rurallab
+label list rurallab
+save merge10,replace
+use "https://docs.google.com/uc?id=1jrGlyM9tmOy9OtILTxuLnJhJuqgPdTvC&export=download",clear
+rename Q0104 rural
+rename Q0811 educ
+recode educ (-8=.)
+egen averural=mean(educ), by(rural)
+collapse educ, by(rural)
+save rural1,replace
+use merge10
+merge m:1 rural using rural1, nogen 
+* Data from WHO Study on Global AGEing and Adult Health 2007-2010 https://www.who.int/healthinfo/sage/en/.
+
+ /*merge8*/
+use "https://docs.google.com/uc?id=1WMOXBRM8910rlTr3VV3uFCXPtuT5LRmC&export=download",clear
+keep if COUNTRY==1 | COUNTRY==10 | COUNTRY==22
+keep COUNTRY RESIDENCE PROVINCE_CHNS AGE INCOME PPP GOODHEALTH BMI
+ren PROVINCE_CHNS PROV
+decode PROV, gen(PROV1)
+replace PROV1 = proper(PROV1)
+save merge11,replace
+use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+collapse (mean) TRUEAGE , by(PROV)
+decode PROV, gen(PROV1)
+replace PROV1 = proper(PROV1)
+merge 1:m PROV1 using merge11 
+/* A lot of non-merge happen in the using dataset because there are a lot of missing value of PROV1 variable in 
+the using dataset. Data from Research on Early Life and Aging Trends and Effects: A Cross-National Study 1996-2008 
+https://www.icpsr.umich.edu/icpsrweb/DSDR/studies/34241.*/
+
 /********************/
 /*descriptive statistics*/
 /********************/
 
 /*by: egen*/
+use eld1.dta, clear
 bys rural14: egen medage=median(age14)
 * creat the median age variable, so we can know the median age in different areas.
 la var medage "median elderly age"
@@ -218,7 +315,6 @@ tab rural12
 //Shows the break down of the interviewee's geograpic location\\
 tab age12
 //Gives break down of how many people are there by age. 
-
 tab ethnic12
 //Break of ethnicity and it appears that han is where 94% of interviewee are from
 sum A52
@@ -370,22 +466,24 @@ tab D14G4A
 tab D11FINANC
 *children primary finncial support accounting for 79% of people followed by retirement accounting 13%. 
 
+tabstat health14 income14 education14 employment14 , by(rural14) 
+tabstat health14 income14 education14 employment14 , by(rural14)  stat(mean sd min max)
+tabstat health14 income14 education14 employment14 , by(rural14) nototal long format
+tabstat health14 income14 education14 employment14 , by(rural14)  nototal long col(stat)
+
 /*****************/
 /* Regression */
 /*****************/
-
 pwcorr health14 age14 education14 income14 employment14, star(.05)
 corr health14 age14 education14 income14 employment14
 
 local control smoking14 marital14 familysize14 sex14
 display "`control'"
 reg health14 happiness14
-reg health14 income14 
-reg health14 income14 education14 employment14
-reg health14 income14 education14 employment14 age14
-*reg health14 income14 education14 employment14 age14 "`control'"
-
-reg health14 happiness14 `control'  // Problem?
+reg health14 happiness14 income14 
+reg health14 happiness14 income14 education14 employment14
+reg health14 happiness14 income14 education14 employment14 age14
+reg health14 happiness14 income14 education14 employment14 age14 `control' 
 reg happiness14 ethnic14 rural14 
 reg happiness14 ethnic14 rural14 income14 education14 employment14 age14
 
@@ -394,7 +492,8 @@ eststo model2
 esttab, r2 ar2 se scalar(rmse)
 predict health14_predict
 scatter health14 health14_predict
-xi: regress health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
+
+xi: regress function14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
 ovtest
 
 reg health14 i. ethnic14
@@ -421,58 +520,141 @@ scatter health14 income14 ,ml(ethnic14)
 /* Visualizing data*/
 /*****************/
 
-tab ethnic14
 * Start to visualize the data 
 *Basic descriptive statistic 
+tab ethnic14
 sum age14
 hist age14, frequency normal
+*validated age with frequncy 
+gr export graph1.eps, replace  //pdf, png, etc
+
+hist income14,normal
+gr export graph2.eps, replace  //pdf, png, etc
+
 histogram health14, discrete freq addlabels xlabel(0 1(1)9,valuelabel)
+*Here we see the breakdown of self-reported health their respective breakdown
+gr export graph3.eps, replace  //pdf, png, etc
+
 histogram ethnic14, discrete freq addlabels xlabel(0 1,valuelabel)
+*ethnic grup breakdown
+gr export graph4.eps, replace  //pdf, png, etc
+
 histogram rural14, discrete freq addlabels xlabel(0 1, valuelabel)
-histogram income14, discrete freq addlabels xlabel(0 1, valuelabel)
-histogram happiness14, discrete freq addlabels 
+*breakdown of city, town and rural 
+gr export graph4.eps, replace  //pdf, png, etc
+
+histogram income14, discrete freq addlabels xlabel
+gr export graph5.eps, replace  //pdf, png, etc
+
+histogram happiness14, discrete freq addlabels
+*#number of people who indicated that they'd be happier if they were younger
+gr export graph6.eps, replace  //pdf, png, etc 
+
 histogram education14, discrete freq addlabels 
-histogram employment14, discrete freq addlabels 
+gr export graph7.eps, replace  //pdf, png, etc
+
+histogram employment14, discrete freq addlabels
+*paid enagement post job
+gr export graph8.eps, replace  //pdf, png, etc 
+
+histogram age14, frequency by(rural14)
+gr export graph9.eps, replace  //pdf, png, etc
+
+hist health14, frequency by(rural14)
+gr export graph10.eps, replace  //pdf, png, etc
+
+hist health14, frequency by(sex14)
+gr export graph11.eps, replace  //pdf, png, etc
+
+hist function14, frequency by(sex14)
+gr export graph12.eps, replace  //pdf, png, etc
 
 *Group Statistic 
 tab rural14, sum (age14)
 tab ethnic14, sum (age14)
-histogram age14, frequency by(rural14)
-hist health14, frequency by(rural14)
 tab rural14, sum (health14)
 tab health14, sum (rural14)
 histogram health14 , normal
-hist age14,normal
+
 twoway histogram health14 , discrete freq by(rural14)
+gr export graph13.eps, replace  //pdf, png, etc
+
 twoway histogram health14 , discrete freq by(ethnic14)
+gr export graph14.eps, replace  //pdf, png, etc
+
 twoway histogram age14 , discrete freq by(rural14)
+gr export graph14.eps, replace  //pdf, png, etc
+
 twoway histogram age14 , discrete freq by(ethnic14)
+gr export graph14.eps, replace  //pdf, png, etc
+
+twoway histogram function14 , discrete freq by(ethnic14)
+gr export graph14.eps, replace  //pdf, png, etc
+
+twoway histogram function14 , discrete freq by(rural14)
+gr export graph14.eps, replace  //pdf, png, etc
+
 tw(scatter health14 age14)(lfit health14 age14)
+twoway (scatter health14 age14) if age14>65
+twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small))
+twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age)
+twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age) legend(on)
+twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) by(, legend(on)) by(rural14, total)
+gr export graph25.eps, replace  //pdf, png, etc
+
 histogram age14, discrete freq by( ethnic14 , total)
 
 reg age14 ethnic14 rural14
 scatter age14 ethnic14 || lfit age14 ethnic14
+gr export graph15.eps, replace  //pdf, png, etc
+
 scatter health14 education14 || lfit health14 education14
+*negative realtionship b/w health and years of schooling
+gr export graph16.eps, replace  //pdf, png, etc
+
 tabstat health14 , by( ethnic14 ) stat(mean sd min max) nototal long format
 tabstat age14 , by( rural14 ) stat(mean sd min max) nototal long format
-graph bar health14, over(PROV) bargap(50)
+
+graph hbar health14, over(PROV) bargap(50)
+*Mean of self-reported health by provinces
+gr export graph17.eps, replace  //pdf, png, etc
+
 symplot age14 
+gr export graph18.eps, replace  //pdf, png, etc
+
 symplot income14
+gr export graph19.eps, replace  //pdf, png, etc
+
+symplot marital14
+gr export graph20.eps, replace  //pdf, png, etc
+
 graph matrix health14 age14, by(ethnic14, total)
+/* Self-reported health and validated age by provinces*/
+gr export graph121.eps, replace  //pdf, png, etc
+
+graph matrix health14 income14, by(rural14, total)
+gr export graph122.eps, replace  //pdf, png, etc
+
 qnorm age14, grid
-*tab A2 , sum (TRUEAGE)
+gr export graph23.eps, replace  //pdf, png, etc
+
+tab ethnic14 , sum (age14)
 graph matrix health14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
+gr export graph24.eps, replace  //pdf, png, etc
+graph matrix function14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
+gr export graph25.eps, replace  //pdf, png, etc
+
 
 
 /*****************/
 /*Outreg*/
 /*****************/
 
+*export model1
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
 
 use merge1, clear
 
- *run some regression
 reg health14 income14 
 /* *and then export to excel, note eform option that will exponentiate betas; ct will give it column title A1 */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel replace ct(A1) lab
@@ -495,6 +677,32 @@ outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A6) lab
 reg health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
+
+*export model2
+use merge1, clear
+reg function14 income14 
+/* *and then export to excel, note eform option that will exponentiate betas; ct will give it column title A1 */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel replace ct(A1) lab
+/* *then i run some otjer specification */
+reg function14 income14 education14 
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A2) lab  
+reg function14 income14 education14 employment14 
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A3) lab 
+reg function14 income14 education14 employment14 smoking14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A4) lab  
+reg function14 income14 education14 employment14 smoking14 marital14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A5) lab
+reg function14 income14 education14 employment14 smoking14 marital14 familysize14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A6) lab
+reg function14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
+
 
 /**************/
 /* references */
