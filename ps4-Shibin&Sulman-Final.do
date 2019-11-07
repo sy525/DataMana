@@ -385,7 +385,6 @@ tab ethnic12 D4VIT1
 tab PROV D5
 /* It appears that most povinces drink boiled water. */
 
-
 tab rural12 B11
 /* Perhaps the most important tab of all. It gives breakdown of self-reported
 health in city, town and rural areas. It appears that more people in terms
@@ -482,7 +481,7 @@ reg health14 income14 education14 employment14
 reg health14 income14 education14 employment14 age14
 reg health14 income14 education14 employment14 age14 "`control'"
 
-reg health14 happiness14 `depen1'  // Problem?
+reg health14 happiness14 `control'  // Problem?
 reg happiness14 ethnic14 rural14 
 reg happiness14 ethnic14 rural14 income14 education14 employment14 age14
 
