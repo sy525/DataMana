@@ -109,7 +109,7 @@ rename E11 walking14
 rename E12 carrying14
 *E6 to E12 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
 
-* generate one depdendent variabel
+* generate one depdendent variabel-functional capacity of the elderly
 egen ADL= rowmean (bathing14 dressing14)
 egen ADL1= rowmean (ADL toileting14)
 egen ADL2= rowmean (ADL1 transfer14)
