@@ -152,7 +152,6 @@ rename F1 education12
 rename F23 employment12
 local depen age12 rural12 sex12 ethnic12 happiness12 marital12 born12 PROV income12 education12
 display "`depen'"
-rename F1 education12
 rename A52 familysize12
 rename D71 smoking12
 rename E1 bathing12
