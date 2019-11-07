@@ -182,7 +182,7 @@ the reason for the non-merge is because thousands of new observations add into t
 master datasets. 
 */
 save merge1.dta,replace
-reshape long rural age, i(ID) j(year)
+*reshape long rural age, i(ID) j(year)
 /* by reshaping the rural variable, we can see the change on the place of the elderly. It is
 significant to observe the change of living places of the elderly. We would like to test the hypothesis
 that elderly living in the city area will have a better life expectancy or health resources than their
