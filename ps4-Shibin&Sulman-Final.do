@@ -56,12 +56,12 @@ is a fundamental cause of health disparity. Disparities in health have persisted
 and groups who experience some of the greatest disparities in health tend to experience the greatest 
 socioeconomic disparities. Shavers argues that SES is a significant contributor to the disparate 
 health observed among ethnic groups in different regions (rural/ urban). Based on Shavers’s model, 
-the study measure SES included occupation, income, and education.  Using this model, the socioeconomic 
+the study measure SES included occupation, income, and education. Using this model, the socioeconomic 
 status of the ethnic group of elderly from urban/ rural areas are the independent variables. 
 
-Dependent Variables: self-rated health status,functional capacity.
+Dependent Variables: self-rated health status,functional capacity (ADLs& IADLs) .
 
-Control Variables:gender, marital status, family size.
+Control Variables: gender, marital status, family size.
 */
 
 
@@ -92,13 +92,39 @@ rename B12 health14
 rename F35 income14
 rename F23 employment14
 rename F1 education14
- 
-/* the key variables for this study is age, residence location, ethinicty, marital status, 
-health status.  */
+rename A52 familysize14
+rename D71 smoking14
+rename E1 bathing14
+rename E2 dressing14
+rename E3 toileting14
+rename E4 transfer14
+rename E5 continen14
+*E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
+rename E6 feeding14
+rename E7 visiting14
+rename E8 shopping14
+rename E9 cooking14
+rename E10 washing14
+rename E11 walking14
+rename E12 carrying14
+*E6 to E12 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
+
+* generate one depdendent variabel
+egen ADL= rowmean (bathing14 dressing14)
+egen ADL1= rowmean (ADL toileting14)
+egen ADL2= rowmean (ADL1 transfer14)
+egen ADL3= rowmean (ADL2 continen14)
+sort ADL
+list ADL
+egen IADL= rowmean (feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14)
+sort IADL
+list IADL
+egen function14= rowmean (ADL3 IADL)
+
 * recode the rural variable
-recode rural14 (3=0) (1 2=1) (-99=.)
+recode rural14 (3=0) (1 2=1) (-99=.),gen(Rural14) 
 la de rurallab 0 "Rural" 1 "Urban"
-la val rural14 rurallab
+la val Rural14 rurallab
 label list rurallab
 * recode the ethnicity variable
 recode ethnic14  (1=0) (2 3 4 5 6 7 8=1),gen(major14) 
@@ -112,7 +138,7 @@ save eld1.dta, replace
 //may want to save this! you do all this work and then it gets lost: when you do graphs and visuzalizations later, 
 //its much better to start with clean labelled data than just run everything from scratch again 
 
-* the second data set--the using dataset which are used to merge.
+* the second dataset--the using dataset which are used to merge.
 use "https://docs.google.com/uc?id=1_exDjt1Rbc1B18wX0oMgyRZeWpm04uKH&export=download",clear
 rename TRUEAGE age12
 rename RESIDENC rural12
@@ -123,8 +149,26 @@ rename F41 marital12
 rename A41 born12
 rename F35 income12
 rename F1 education12
+rename F23 employment12
 local depen age12 rural12 sex12 ethnic12 happiness12 marital12 born12 PROV income12 education12
 display "`depen'"
+rename F1 education12
+rename A52 familysize12
+rename D71 smoking12
+rename E1 bathing12
+rename E2 dressing12
+rename E3 toileting12
+rename E4 transfer12
+rename E5 continen12
+*E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
+rename E6 feeding12
+rename E7 visiting12
+rename E8 shopping12
+rename E9 cooking12
+rename E10 washing12
+rename E11 walking12
+rename E12 carrying12
+*E6 to E12 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
 save eld2.dta, replace
 
 /*****************/
@@ -133,9 +177,41 @@ save eld2.dta, replace
 
 /*merge1*/ 
 sort ID
- merge 1:1 ID using eld1.dta, force
-* the result shows that 53 data are successful merged.
+merge 1:1 ID using eld1.dta, force
+/*
+the reason for the non-merge is because thousands of new observations add into the 
+master datasets. 
+*/
 save merge1.dta,replace
+reshape long rural age, i(ID) j(year)
+/* by reshaping the rural variable, we can see the change on the place of the elderly. It is
+significant to observe the change of living places of the elderly. We would like to test the hypothesis
+that elderly living in the city area will have a better life expectancy or health resources than their
+counterpart in the rural area. These are several observations of data we found can support the hypothesis. 
+The reshape can help us easier to compare the data, especially a large dataset. */
+
+/*merge2*/
+use eld2.dta,clear
+drop  age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
+merge 1:1 ID using eld1.dta, nogen
+save merge2.dta,replace
+
+/*merge3*/
+use "https://docs.google.com/uc?id=1r0brtgXRy0r39L6p1TOUimh8ULZGJIb2&export=download",clear
+recode PBIRTH (5=0) (1 2 3 4=1) (-99=.)
+label define rural 0 Urban 1 Rural
+label list rural
+merge 1:1 ID using merge2.dta, nogen
+save merge3.dta,replace
+
+/*merge4*/
+use "https://docs.google.com/uc?id=1T87WO8AvWbsfkekR3H0NIeQRhmzHN3aG&export=download",clear
+rename S104 marital
+save data1,replace
+use merge1.dta, clear
+*reshape long marital, i(ID) j(year)
+merge 1:1 ID using merge1.dta, nogen
+save merge4.dta,replace
 
 /*merge5*/
 use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
@@ -167,7 +243,6 @@ list PROV RESIDENC V_BTHMON if _merge==1 | _merge==2
 the reason for the non-merge is because there is different way to spell the name of
  province name between the master dataset and using dataset, such as Shannxi and 
  Shaanxi.
- 
 */
 * Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
 
@@ -236,15 +311,191 @@ the meanage14 variable. The result shows that 97 Han majority people live as lon
 la var meanage "mean elderly age"
 tab meanage14 ethnic14
 
+tab rural12
+//Shows the break down of the interviewee's geograpic location\\
+tab age12
+//Gives break down of how many people are there by age. 
+
+tab ethnic12
+//Break of ethnicity and it appears that han is where 94% of interviewee are from
+sum A52
+// summarizing # of people living with you and on average about 3
+
+tab A532
+/* tabulating whether the participant have their own bedroom and it appears that
+nearly 94% of them actually do. */
+tab A533
+/*  This tells me the type of dwelling participant lives in and it appears that
+detached house is the predominatly the main type  accounting for 2/3. */
+tab A530
+/*a530 examinzes if the house/apartment of the elder" purchased/self-built/
+inherited/rented? And the answer appears to be that most of the houses are
+self-built. */
+
+tab A535
+/* House damage? It appears that most (72%) people didn't have house damaged.*/
+
+tab A537
+/* Which fuels are you using for cooking? It appears that most people are using
+firewood-straw. It probaly has an impact on their health.*/
+
+tab A540
+/* the primary reason that you live in an institution (elderly center) it 
+appears that data is missing for 85% of the people but no child is the
+reason that most people are living in elderly care. */
+
+sum A541 
+/* It appeats that 8543 is average monthly cost of living in elderly home. This 
+is probaly in Chinese curreny. */
+
+tab A542
+/*Who pays living cost? Children and spouses but data missing for 84% people */
+
+tab B11 
+/* self-reported quality of life it appears that nearly 41% feel that their health 
+is good. */
+
+tab B21 
+/* intrestingly nearly 59% of the people think bright side of things. */
+
+tab B22
+/* Nearly 52% of people keep their belongings "often clean."*/
+
+tab B23 
+/* nearly 38% of the people  seldom feel fearful or anxious. */
+
+tab B24 
+/* nearly 33% of the elderly seldom feel lonely. */
+
+tab B25  
+/* nearly 50% of the elder in combinded percetage make their own decision */
+
+tab ethnic12 D5
+/* Gives break down of ethnic group and the kind of water that they are 
+drinking? */
+
+tab ethnic12 B11
+/* breakdown of self-resported health by ethnic group */
+
+tab ethnic12 RDEMILK
+/* It appears that in genreal that most people are without milk. */
+
+tab ethnic12 D4VIT1
+/* Certainly higher percetage of Han provinces versus others. */
+
+tab PROV D5
+/* It appears that most povinces drink boiled water. */
+
+
+tab rural12 B11
+/* Perhaps the most important tab of all. It gives breakdown of self-reported
+health in city, town and rural areas. It appears that more people in terms
+of percetage reported to have been very good in terms of health versus town and
+rural areas. */
+tab rural12 PROV
+/* Larger number of people from this sample appear to be from rural areas.*/
+
+tab happiness12
+/* Intrestingly there appears to be large population 32% who that they would be 
+happier if they were younger. */
+
+tab rural12 happiness12
+/*Happiness by region rural, town, and city. */ 
+
+graph bar (sum) happiness12, over(rural12) by(happiness12)
+/* Graph by region and whether they happier if were younger.*/
+
+tab rural12 F652B
+/* It does appear that cast majority of people in genreal don't have physical
+examination once a years in genreal. */
+
+sum F9
+*About 4 siblings with std deviation of 7
+
+tab F111A
+/* Whom you ususally speak? Turns out spouse and son are the highest while 
+neighbor is 3rd. But there are 479 people who speak with no one. */
+
+tab B11 F111A
+/* Surprisingly there are small amount of people who are talking with no one
+but still reported quality of life to be very good. */
+tab F112A
+/*1st person to whom you talk first when you need to share your thoughts? 1) Son
+then spouse...somewhat surprising*/
+
+tab rural12 F142
+/*It appears higher percetage of 30%rural people have access to home visit 
+services */
+graph pie [pweight = rural12], over(rural12) sort(rural12)
+*Breakdown of population in pie chart. 
+
+tab G14C1 rural12
+*breakdown of diseases by region
+
+tab rural12 H3
+*interviewer rated the participants health...inclusive table
+
+tab B28_14 rural12
+/*categories of residenze in city, town and rural  and feelings in terms of sad, 
+depressed and blue */
+
+histogram D31_14, title(Number of Time able to Eat Fruit)
+* Ability to eat fruit
+
+tab D31_14
+*more detailed with fruits
+
+tab D4MEAT2_14 rural12
+* meant breakdown by region
+graph pie [pweight = rural12], over(E9) title(Do you cook at home?)
+*Vast majority of people cook at home
+
+sum age14
+*average age 85
+
+tab  sex14
+*about 500 more females in the dataset than male
+
+tab D4A B11
+/*Green tea the most specified tea and those who drink reported better quality of
+life. */
+
+tab marital14
+*58% of people widowed and 39% currently married and not surprising  less 1 never married
+tab D14G4A
+*right handed people accounted for 53% and left handed less than 1%
+
+tab D11FINANC
+*children primary finncial support accounting for 79% of people followed by retirement accounting 13%. 
 
 /*****************/
-/* Regression  */
+/* Regression */
 /*****************/
 
 pwcorr health14 age14 education14 income14 employment14, star(.05)
 corr health14 age14 education14 income14 employment14
 
+local control smoking14 marital14 familysize14 sex14
+display "`control'"
+reg health14 happiness14
+reg health14 income14 
+reg health14 income14 education14 employment14
+reg health14 income14 education14 employment14 age14
+reg health14 income14 education14 employment14 age14 "`control'"
 
+reg health14 happiness14 `depen1'  // Problem?
+reg happiness14 ethnic14 rural14 
+reg happiness14 ethnic14 rural14 income14 education14 employment14 age14
+
+xi: regress health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
+eststo model2
+esttab, r2 ar2 se scalar(rmse)
+predict health14_predict
+scatter health14 health14_predict
+xi: regress health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
+ovtest
+
+reg health14 i. ethnic14
 gen ethage = age14 * ethnic14
 regress health14 age14 ethnic14 ethage
 regplot, by(ethnic14)
@@ -260,6 +511,10 @@ regress health14 education14 major14 ethe
 regplot, by(major14)
 regplot, sep(major14)
 
+// Robust Check
+reg health14 income14 , robust
+scatter health14 income14 ,ml(ethnic14)
+
 /*****************/
 /* Visualizing data*/
 /*****************/
@@ -272,6 +527,10 @@ hist age14, frequency normal
 histogram health14, discrete freq addlabels xlabel(0 1(1)9,valuelabel)
 histogram ethnic14, discrete freq addlabels xlabel(0 1,valuelabel)
 histogram rural14, discrete freq addlabels xlabel(0 1, valuelabel)
+histogram income14, discrete freq addlabels xlabel(0 1, valuelabel)
+histogram happiness14, discrete freq addlabels 
+histogram education14, discrete freq addlabels 
+histogram employment14, discrete freq addlabels 
 
 *Group Statistic 
 tab rural14, sum (age14)
@@ -283,45 +542,57 @@ tab health14, sum (rural14)
 histogram health14 , normal
 hist age14,normal
 twoway histogram health14 , discrete freq by(rural14)
+twoway histogram health14 , discrete freq by(ethnic14)
 twoway histogram age14 , discrete freq by(rural14)
 twoway histogram age14 , discrete freq by(ethnic14)
 tw(scatter health14 age14)(lfit health14 age14)
 histogram age14, discrete freq by( ethnic14 , total)
+
 reg age14 ethnic14 rural14
 scatter age14 ethnic14 || lfit age14 ethnic14
+scatter health14 education14 || lfit health14 education14
 tabstat health14 , by( ethnic14 ) stat(mean sd min max) nototal long format
 tabstat age14 , by( rural14 ) stat(mean sd min max) nototal long format
 graph bar health14, over(PROV) bargap(50)
-symplot age14
+symplot age14 
+symplot income14
 graph matrix health14 age14, by(ethnic14, total)
 qnorm age14, grid
-tab A2 , sum ( TRUEAGE )
+tab A2 , sum (TRUEAGE)
+graph matrix health14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 
 
 /*****************/
-/* Outreg* /
+/*Outreg*/
 /*****************/
 
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
 
 use merge1, clear
 
-/* *run some regression */
-reg health14 age14 
+ *run some regression
+reg health14 income14 
 /* *and then export to excel, note eform option that will exponentiate betas; ct will give it column title A1 */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel replace ct(A1) lab
 /* *then i run some otjer specification */
-reg health14 age14 education14 
+reg health14 income14 education14 
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A2) lab  
-reg health14 age14 education14 income14 
+reg health14 income14 education14 employment14 
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A3) lab 
-reg health14 age14 education14 income14 employment14 
+reg health14 income14 education14 employment14 smoking14
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A4) lab  
-
-
+reg health14 income14 education14 employment14 smoking14 marital14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A5) lab
+reg health14 income14 education14 employment14 smoking14 marital14 familysize14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A6) lab
+reg health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
 /**************/
 /* references */
@@ -329,4 +600,3 @@ outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A4) lab
 1. Chinese Longitudinal Healthy Longevity Survey 
 (https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
 
-2. 
