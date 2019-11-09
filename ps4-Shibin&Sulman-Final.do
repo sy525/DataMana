@@ -176,11 +176,13 @@ save eld2.dta, replace
 
 /*merge1*/ 
 sort ID
-merge 1:1 ID using eld1.dta, force
+merge 1:1 ID using eld1.dta, force //no try to fix it instead of forcing!
 /*
 the reason for the non-merge is because thousands of new observations add into the 
 master datasets. 
 */
+//no, data from both master and using fails to merge! need to explain why!! 
+
 save merge1.dta,replace
 *reshape long rural age, i(ID) j(year)
 /* by reshaping the rural variable, we can see the change on the place of the elderly. It is
@@ -189,17 +191,18 @@ that elderly living in the city area will have a better life expectancy or healt
 counterpart in the rural area. These are several observations of data we found can support the hypothesis. 
 The reshape can help us easier to compare the data, especially a large dataset. */
 
-
+//merge2 is the same as merge1!!!
 /*merge2*/
 use eld2.dta,clear
 drop  age12 rural12 sex12 ethnic12 happiness12 marital12 born12 
 merge 1:1 ID using eld1.dta, force
 save merge2.dta,replace
 
+//what are these data ?? where they come from?? need to give source/url and dataset name!!
 /*merge3*/
 use "https://docs.google.com/uc?id=1r0brtgXRy0r39L6p1TOUimh8ULZGJIb2&export=download",clear
 recode PBIRTH (5=0) (1 2 3 4=1) (-99=.)
-label define rural 0 Urban 1 Rural
+label define rural 0 Urban 1 Rural //so you define label but never apply it? doesnt make sense!
 label list rural
 merge 1:1 ID using merge2.dta, nogen
 save merge3.dta,replace
@@ -210,7 +213,7 @@ rename S104 marital
 save data1,replace
 use merge1.dta, clear
 *reshape long marital, i(ID) j(year)
-merge 1:1 ID using merge1.dta, nogen
+merge 1:1 ID using merge1.dta, nogen //mistake! you are merging merge1 with merge1
 save merge4.dta,replace
 
 /*merge5*/
@@ -474,6 +477,9 @@ tabstat health14 income14 education14 employment14 , by(rural14)  nototal long c
 /*****************/
 /* Regression */
 /*****************/
+//explain some of the results--how results relate to initial hypotheses? use estout or outreg2 to export; make sure regressions
+//are motivated by literature!
+
 pwcorr health14 age14 education14 income14 employment14, star(.05)
 corr health14 age14 education14 income14 employment14
 
