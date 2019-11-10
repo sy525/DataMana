@@ -558,6 +558,5 @@ outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 /**************/
 /* references */
 /**************/
-*1. Chinese Longitudinal Healthy Longevity Survey 
-(https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
+*1. Chinese Longitudinal Healthy Longevity Survey  (https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
 
