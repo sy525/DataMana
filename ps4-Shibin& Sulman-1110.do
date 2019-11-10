@@ -479,6 +479,9 @@ gr export graph24.png, replace  //pdf, png, etc
 graph matrix function14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 gr export graph25.png, replace  //pdf, png, etc
 
+///Sulman: these are the variables you can play with:  health14 function14 income14 education14 employment14 age14 
+smoking14 marital14 familysize14 sex14. Right now we try to find the casuality relationship between health, function disability and income
+education,employment, age, smoking, marital status and gender and family size. 
 
 
 /*****************/
