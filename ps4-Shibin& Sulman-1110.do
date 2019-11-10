@@ -70,9 +70,15 @@ Control Variables: gender, marital status, family size.
 clear
 set more off
 version 15
-
 //////////////////////////////////////////////////////////
 
+
+//////////////////////Package Install////////////////////////
+
+net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
+*net install regplot, from(http://www.stata-journal.com/software/sj4-4/) 
+
+//////////////////////////////////////////////////////////
 
 /********************/
 /* data cleaning*/
@@ -319,8 +325,6 @@ reg health14 happiness14 income14 education14 employment14 age14 `control' , rob
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
 
-
-
 local control smoking14 marital14 familysize14 sex14
 display "`control'"
 reg function14 happiness14
@@ -362,6 +366,10 @@ scatter health14 income14 ,ml(ethnic14)
 /*****************/
 /* Visualizing data*/
 /*****************/
+/* Sulman
+The variable you can play with are: dependent (health14 function14) ; independent ( income14 education14 employment14 ); 
+control (smoking14 marital14 familysize14 sex14).
+*/
 
 *Start to visualize the data 
 tab ethnic14
@@ -389,7 +397,7 @@ histogram income14, discrete freq addlabels
 gr export graph5.png, replace  //pdf, png, etc
 
 
-histogram education14, discrete freq addlabels /// problem
+histogram education14, discrete freq addlabels 
 gr export graph7.png, replace  //pdf, png, etc
 
 histogram employment14, discrete freq addlabels
@@ -441,7 +449,7 @@ twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) title(the 
 twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) by(, legend(on)) by(rural14, total)
 gr export graph25.png, replace  //pdf, png, etc
 
-twoway (scatter health14 income14) (lfit health14 income14) ///new
+twoway (scatter health14 income14) (lfit health14 income14)
 * how to interpret the graph like this?
 
 histogram age14, discrete freq by( ethnic14 , total)
@@ -493,7 +501,7 @@ gr export graph25.png, replace  //pdf, png, etc
 /*****************/
 
 *export model1
-net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
+
 
 use merge5, clear
 
@@ -546,8 +554,10 @@ reg function14 income14 education14 employment14 smoking14 marital14 familysize1
 outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
 
+
 /**************/
 /* references */
 /**************/
-1. Chinese Longitudinal Healthy Longevity Survey 
+*1. Chinese Longitudinal Healthy Longevity Survey 
 (https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
+
