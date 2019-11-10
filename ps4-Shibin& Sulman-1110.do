@@ -88,7 +88,7 @@ rename A2 ethnic14
 rename B27 happiness14
 rename F41 marital14
 rename A41 born14
-rename B14 health14
+rename B12 health14
 rename F35 income14
 rename F23 employment14
 rename F1 education14
@@ -106,7 +106,7 @@ rename E8 shopping14
 rename E9 cooking14
 rename E10 washing14
 rename E11 walking14
-rename E14 carrying14
+rename E12 carrying14
 *E6 to E14 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
 keep ID YEARIN MONTHIN DAYIN TYPE PROV age14 rural14 sex14 ethnic14 happiness14 marital14 born14 health14 income14  employment14 education14 familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 A542A
 
@@ -136,36 +136,36 @@ save eld1.dta, replace
 
 * the second dataset--the using dataset which are used to merge.
 use "https://docs.google.com/uc?id=1_exDjt1Rbc1B18wX0oMgyRZeWpm04uKH&export=download",clear
-rename TRUEAGE age14
-rename RESIDENC rural14
-rename A1 sex14
-rename A2 ethnic14
-rename B27 happiness14
-rename F41 marital14
-rename A41 born14
-rename F35 income14
-rename B14 health14
-rename F1 education14
-rename F23 employment14
-local depen age14 rural14 sex14 ethnic14 happiness14 marital14 born14 PROV income14 education14
+rename TRUEAGE age12
+rename RESIDENC rural12
+rename A1 sex12
+rename A2 ethnic12
+rename B27 happiness12
+rename F41 marital12
+rename A41 born12
+rename F35 income12
+rename B12 health12
+rename F1 education12
+rename F23 employment12
+local depen age12 rural12 sex12 ethnic12 happiness12 marital12 born12 PROV income12 education12
 display "`depen'"
-rename A52 familysize14
-rename D71 smoking14
-rename E1 bathing14
-rename E2 dressing14
-rename E3 toileting14
-rename E4 transfer14
-rename E5 continen14
+rename A52 familysize12
+rename D71 smoking12
+rename E1 bathing12
+rename E2 dressing12
+rename E3 toileting12
+rename E4 transfer12
+rename E5 continen12
 *E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
-rename E6 feeding14
-rename E7 visiting14
-rename E8 shopping14
-rename E9 cooking14
-rename E10 washing14
-rename E11 walking14
-rename E14 carrying14
-*E6 to E14 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
-keep ID YEARIN MONTHIN DAYIN TYPE PROV age14 rural14 sex14 ethnic14 happiness14 marital14 born14 health14 income14  employment14 education14 familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 A542A
+rename E6 feeding12
+rename E7 visiting12
+rename E8 shopping12
+rename E9 cooking12
+rename E10 washing12
+rename E11 walking12
+rename E14 carrying12
+*E6 to E12 is the variables used to measure elderly's instrumental activities of daily living (IADLs).
+keep ID YEARIN MONTHIN DAYIN TYPE PROV age12 rural12 sex12 ethnic12 happiness12 marital12 born12 health12 income12  employment12 education12 familysize12 smoking12 bathing12 dressing12 toileting12 transfer12 continen12 feeding12 visiting12 shopping12 cooking12 washing12 walking12 carrying12 A542A
 
 save eld2.dta, replace
 
@@ -316,12 +316,19 @@ reg health14 happiness14 income14
 reg health14 happiness14 income14 education14 employment14
 reg health14 happiness14 income14 education14 employment14 age14
 reg health14 happiness14 income14 education14 employment14 age14 `control' , robust
+outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
+
+
+
+local control smoking14 marital14 familysize14 sex14
+display "`control'"
 reg function14 happiness14
 reg function14 happiness14 income14 
 reg function14 happiness14 income14 education14 employment14
 reg function14 happiness14 income14 education14 employment14 age14
 reg function14 happiness14 income14 education14 employment14 age14 `control' , robust
+outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
 xi: regress health14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
 eststo model2
@@ -378,12 +385,9 @@ histogram rural14, discrete freq addlabels
 *breakdown of city, town and rural 
 gr export graph4.png, replace  //pdf, png, etc
 
-histogram income14, discrete freq addlabels xlabel
+histogram income14, discrete freq addlabels 
 gr export graph5.png, replace  //pdf, png, etc
 
-histogram happiness14, discrete freq addlabels
-*#number of people who indicated that they'd be happier if they were younger
-gr export graph6.png, replace  //pdf, png, etc 
 
 histogram education14, discrete freq addlabels /// problem
 gr export graph7.png, replace  //pdf, png, etc
@@ -437,6 +441,9 @@ twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) title(the 
 twoway (scatter health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) by(, legend(on)) by(rural14, total)
 gr export graph25.png, replace  //pdf, png, etc
 
+twoway (scatter health14 income14) (lfit health14 income14) ///new
+* how to interpret the graph like this?
+
 histogram age14, discrete freq by( ethnic14 , total)
 
 reg age14 ethnic14 rural14
@@ -479,9 +486,6 @@ gr export graph24.png, replace  //pdf, png, etc
 graph matrix function14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 gr export graph25.png, replace  //pdf, png, etc
 
-///Sulman: these are the variables you can play with:  health14 function14 income14 education14 employment14 age14 
-smoking14 marital14 familysize14 sex14. Right now we try to find the casuality relationship between health, function disability and income
-education,employment, age, smoking, marital status and gender and family size. 
 
 
 /*****************/
@@ -491,7 +495,7 @@ education,employment, age, smoking, marital status and gender and family size.
 *export model1
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
 
-use merge1, clear
+use merge5, clear
 
 reg health14 income14 
 /* *and then export to excel, note eform option that will exponentiate betas; ct will give it column title A1 */
@@ -517,7 +521,7 @@ reg health14 income14 education14 employment14 smoking14 marital14 familysize14 
 outreg2 using reg1.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 
 *export model2
-use merge1, clear
+use merge5, clear
 reg function14 income14 
 /* *and then export to excel, note eform option that will exponentiate betas; ct will give it column title A1 */
 outreg2 using reg2.xls, onecol bdec(2) st(coef) excel replace ct(A1) lab
@@ -547,4 +551,3 @@ outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 /**************/
 1. Chinese Longitudinal Healthy Longevity Survey 
 (https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
-
