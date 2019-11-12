@@ -80,7 +80,7 @@ version 15
 //////////////////////Package Install////////////////////////
 
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
-*net install regplot, from(http://fmwww.bc.edu/RePEc/bocode/o) 
+*net install regplot, from(http://www.stata-journal.com/software/sj4-4/) 
 
 //////////////////////////////////////////////////////////
 
@@ -141,6 +141,13 @@ label list ethniclab
 recode marital14 (2 3 4 5=0) (1=1), gen(spouse14)
 la de maritallab 0 "single" 1 "spouse"   
 la val spouse14 maritallab
+* recode the health variable
+recode health14 (5=1) (4=2)(3=3)(2=4) (1=5)(8 9 .=.),gen(Health14) 
+la de healthlab 1 "very bad" 2 "bad" 3 "so so" 4 "good" 5 "very good"
+la val Health14 healthlab
+label list healthlab
+tab Health14,m 
+tab Health14,nola
 save eld1.dta, replace
 
 
@@ -389,7 +396,7 @@ twoway (bar health14 rural14, sort), by(rural14, total) subtitle(, size(medium))
 /* This is a very important graph. It suggest that people who live in rural areas
 self-reported better health than those who were living in city and town. */
 
- graph bar (mean) health14, over(major14) by(rural14)
+ graph bar (mean) Health14, over(major14) by(rural14)
  /* If you're Han irrespective of whether you're from rural or urban your health is
  the same. This is in response to the first hypothe sis. However,  Han (majority) 
  elderly living in an urban area are marginally better health status than the
@@ -398,7 +405,7 @@ self-reported better health than those who were living in city and town. */
  than the minorities in an urban area as it is the same. The minorities elderly 
  living in an urban area do not have a better health status than those in a 
  rural area possible reason is likly to be pollution. */
-
+/// Sulman: it seems that we need to redo the interpretation again after the change.
 
 histogram health14, discrete frequency lcolor(magenta) lalign(outside) horizontal addlabel by(, title(Overall Self-Reported Health)) by(health14)
 *Here we see the breakdown of self-reported health their respective breakdown
@@ -581,5 +588,4 @@ outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
 /**************/
 /* references */
 /**************/
-*1. Chinese Longitudinal Healthy Longevity Survey 
-(https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
+*1. Chinese Longitudinal Healthy Longevity Survey  (https://www.icpsr.umich.edu/icpsrweb/NACDA/studies/36692)
