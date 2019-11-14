@@ -1,6 +1,6 @@
-* Data Management Project- Probelm Set 4
+* Data Management Project- Probelm Set 5
 *Shibin Yan & Sulman Saleem, Fall 2019
-*Revised: Fall 2019 Nov.7
+*Revised: Fall 2019 Nov.14
 *----------------------------
 
 //---------------------------data mgmt----------------------------------------------
@@ -280,8 +280,7 @@ bys ethnic14: egen meanage=mean(age14)
 /* we would liek to know the mean of elderly age from different ethnicity groups. So we creat
 the meanage14 variable. The result shows that 97 Han majority people live as long as 89 years.
  */
-la var meanage "mean elderly age"
-tab meanage14 ethnic14
+
 
 tab rural14
 //Shows the break down of the interviewee's geograpic location\\
@@ -332,7 +331,6 @@ display "`varin'"
 
 
 foreach s in "rural14 "  "rural14 ethnic14" "rural14 ethnic14  income14 education14 employment14"{
-outreg2 using reg1.xls,  bdec(2) st(coef) excel append lab
 reg Health14 `s'
 }
 
@@ -606,9 +604,6 @@ foreach m of local r2 {
 di `m'
 }
 
-foreach var of varlist E1-E5 {
-  rename `var' `var'12 
-}
 
 
 
@@ -621,7 +616,6 @@ graph twoway (scatter Health14 Urban14) (lfit Health14 Urban14)
 reg Health14 Urban14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
 rvfplot, yline(0)
 gr export g1.eps, replace
-
 estat hettest
 estat imtest
 estat szroeter, rhs
