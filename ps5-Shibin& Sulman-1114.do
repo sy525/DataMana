@@ -605,6 +605,13 @@ di `m'
 }
 
 
+foreach iv in "rural14 "  "rural14 ethnic14" "rural14 ethnic14 income14 education14 employment14"{
+	foreach dv in  Health14 function14 {
+         reg `dv' `iv'
+		 
+}
+}
+
 
 
 //-----------------Violation------------------------------------------------
