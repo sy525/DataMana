@@ -116,11 +116,14 @@ rename E12 carrying14
 
 local idvar ID YEARIN MONTHIN DAYIN TYPE PROV
 display "`idvar'"
-keep  age14 rural14 sex14 `idvar' ethnic14 happiness14 marital14 born14 health14 income14  employment14 education14 familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 A542A
+keep  age14 rural14 sex14 `idvar' ethnic14 happiness14 marital14 born14 health14 income14  employment14 education14 ///
+familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 ///
+cooking14 washing14 walking14 carrying14 A542A
 
 
 * Factor Analysis 
-factor feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 bathing14 dressing14 toileting14 transfer14 continen14,ipf factor(2)
+factor feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 bathing14 dressing14 ///
+toileting14 transfer14 continen14,ipf factor(2)
 rotate, varimax horst
 predict factor1 factor2 
 egen function14 = rowmean(factor1 factor2)
@@ -171,6 +174,7 @@ rename E3 toileting12
 rename E4 transfer12
 rename E5 continen12
 *E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
+
 rename E6 feeding12
 rename E7 visiting12
 rename E8 shopping12
@@ -182,7 +186,8 @@ rename E14 carrying12
 
 local idvar ID YEARIN MONTHIN DAYIN TYPE PROV
 display "`idvar'"
-keep `idvar' age12 rural12 sex12 ethnic12 happiness12 marital12 born12 health12 income12  employment12 education12 familysize12 smoking12 bathing12 dressing12 toileting12 transfer12 continen12 feeding12 visiting12 shopping12 cooking12 washing12 walking12 carrying12 A542A
+keep `idvar' age12 rural12 sex12 ethnic12 happiness12 marital12 born12 health12 income12 /// 
+employment12 education12 familysize12 smoking12 bathing12 dressing12 toileting12 transfer12 continen12 feeding12 visiting12 shopping12 cooking12 washing12 walking12 carrying12 A542A
 save eld2.dta, replace
 
 /*****************/
@@ -257,6 +262,9 @@ save merge5, replace
 /* A lot of non-merge happen in the using dataset because there are a lot of missing value of PROV1 variable in 
 the using dataset. */
 
+
+
+
 /********************/
 /*descriptive statistics*/
 /********************/
@@ -303,10 +311,10 @@ tab marital14
 
 tabstat Health14 income14 education14 employment14 , by(rural14) 
 tabstat Health14 income14 education14 employment14 , by(rural14)  nototal long col(stat)
-* these table can give us the summary statistics of these variable above. So we can have a better sense of the data.
 
 ///Using outreg2 to export summary statistics of all variables in dataset.
-outreg2 using des.doc, replace sum(log) keep(Health14 function14 rural14 ethnic14  income14 education14 employment14 age14 smoking14 marital14 familysize14 sex14)
+outreg2 using des.doc, replace sum(log) keep(Health14 function14 rural14 ethnic14  income14 education14 employment14 age14 ///
+smoking14 marital14 familysize14 sex14)
 
 
 /*****************/
@@ -321,6 +329,13 @@ local control smoking14 marital14 familysize14 sex14
 local varin income14 education14 employment14 age14
 display "`control'"
 display "`varin'"
+
+
+foreach s in "rural14 "  "rural14 ethnic14" "rural14 ethnic14  income14 education14 employment14"{
+outreg2 using reg1.xls,  bdec(2) st(coef) excel append lab
+reg Health14 `s'
+}
+
 reg Health14 rural14 
 reg Health14 rural14 ethnic14
 reg Health14 rural14 ethnic14  income14 
@@ -409,6 +424,36 @@ reveals that mongolia and other ethnic group have a better health than majority.
 some ethnic group do better than majority on health but some don't. We need to know the reason of that. 
 */
 
+reg Health14 i.Urban14##c.familysize14 income14 education14 employment14 smoking14 marital14 , robust beta
+outreg2 using reg13.xls
+
+xi: regress function14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
+ovtest
+reg function14 i.Urban14##c.income14, robust beta
+
+reg function14 i.rural14##c.income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust beta
+
+* use the log for income variable to see the effect!
+
+reg Health14 i. ethnic14
+gen ethage = age14 * ethnic14
+regress Health14 age14 ethnic14 ethage
+regplot, by(ethnic14)
+regplot, sep(ethnic14)
+
+gen ethage1 = age14 * major14
+regress Health14 age14 major14 ethage1
+regplot, by(major14)
+regplot, sep(major14)
+
+gen ethe = education14 * major14
+regress Health14 education14 major14 ethe
+regplot, by(major14)
+regplot, sep(major14)
+
+// Robust Check
+reg Health14 income14 , robust
+scatter Health14 income14 ,ml(ethnic14)
 
 /*****************/
 /* Visualizing data*/
@@ -488,7 +533,8 @@ twoway (scatter Health14 age14) if age14>65
 twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small))
 twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age)
 twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age) legend(on)
-twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) by(, legend(on)) by(rural14, total)
+twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) ///
+by(, legend(on)) by(rural14, total)
 gr export graph25.png, replace  //pdf, png, etc
 
 twoway (scatter Health14 income14) (lfit Health14 income14)
@@ -530,10 +576,57 @@ qnorm age14, grid
 gr export graph23.png, replace  //pdf, png, etc
 
 tab ethnic14 , sum (age14)
-graph matrix Health14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
+graph matrix Health14 income14 education14 employment14 sex14 marital14, half maxis(ylabel(none) xlabel(none))
 gr export graph24.png, replace  //pdf, png, etc
 graph matrix function14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 gr export graph25.png, replace  //pdf, png, etc
+
+
+/// Loops
+
+codebook marital14
+codebook rural14
+levelsof marital14, loc(marital14)
+di "`marital'"
+levelsof rural14, loc(m1)
+levelsof marital14, loc(r1)
+foreach m of local m1 {
+       foreach r of local r1 {
+              tab income14 if marital14 == `m' & rural14 == `r'
+       }
+}
+
+
+foreach var of varlist income12 {
+  rename `var' `var'20 
+}
+
+levelsof marital14, loc(r2)
+foreach m of local r2 {
+di `m'
+}
+
+foreach var of varlist E1-E5 {
+  rename `var' `var'12 
+}
+
+
+
+//-----------------Violation------------------------------------------------
+use merge5, clear
+reg Health14 Urban14 
+predict Healthhat
+graph twoway (scatter Health14 Urban14 ) (line Health14 Urban14, sort)
+graph twoway (scatter Health14 Urban14) (lfit Health14 Urban14)
+reg Health14 Urban14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
+rvfplot, yline(0)
+gr export g1.eps, replace
+
+estat hettest
+estat imtest
+estat szroeter, rhs
+//looks like if we regress on urban there is less heteroskedascity.
+
 
 
 /*****************/
