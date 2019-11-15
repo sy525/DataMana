@@ -74,8 +74,7 @@ version 15
 //////////////////////Package Install////////////////////////
 
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
-*net install regplot, from(http://www.stata-journal.com/software/sj4-4/) 
-
+net install  st0231_1,http://www.stata-journal.com/software/sj12-3 
 //////////////////////////////////////////////////////////
 
 /********************/
