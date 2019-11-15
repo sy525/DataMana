@@ -75,7 +75,7 @@ version 15
 //////////////////////Package Install////////////////////////
 
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
-net install  st0231_1,http://www.stata-journal.com/software/sj12-3 
+net install  st0231_1, from (http://www.stata-journal.com/software/sj12-3) 
 //////////////////////////////////////////////////////////
 
 /********************/
