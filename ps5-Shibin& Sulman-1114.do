@@ -421,6 +421,8 @@ reveals that mongolia and other ethnic group have a better health than majority.
 some ethnic group do better than majority on health but some don't. We need to know the reason of that. 
 */
 
+////////////////// Interaction ////////////////////////////////
+* Find good finding from interaction. Need to interpret
 reg Health14 i.Urban14##c.familysize14 income14 education14 employment14 smoking14 marital14 , robust beta
 outreg2 using reg13.xls
 
@@ -558,16 +560,23 @@ histogram age14, normal
 twoway histogram age14 , discrete freq by(ethnic14)
 gr export graph14.png, replace  //pdf, png, etc
 
-twoway histogram function14 , discrete freq by(ethnic14)
-gr export graph14.png, replace  //pdf, png, etc
+*twoway histogram function14 , discrete freq by(ethnic14)
+*gr export graph14.png, replace  //pdf, png, etc
 *descrpitive 
 
-twoway histogram function14 , discrete freq by(rural14)
-gr export graph14.png, replace  //pdf, png, etc
+*twoway histogram function14 , discrete freq by(rural14)
+*gr export graph14.png, replace  //pdf, png, etc
 *descriptive 
 
 tw(scatter health14 age14)(lfit health14 age14)
+/* the graphy tells us that the relationship between health and age is positive. In other words, 
+the elderly get a better health when they get older. It is not make sense. Let's change the code.
+Exclude the people under 65.
+*/
 twoway (scatter Health14 age14) if age14>65|| lfit Health14 age14, title(Age and Health Assocation Over 65)
+/* Here, the graphy tells us that the relationship between health and age is negative. It is matched with our
+observation. 
+*/
 twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small))
 
 scatter Health14 age14 || lfit Health14 age14, title(Age and Health)
@@ -582,7 +591,6 @@ twoway (scatter Health14 income14) (lfit health14 income14)
 histogram age14, discrete freq by( ethnic14 , total) 
 *check distribution of the data
 
-
 symplot age14 
 gr export graph18.png, replace  //pdf, png, etc
 *dispersion of data below and above mean**
@@ -596,7 +604,6 @@ gr export graph20.png, replace  //pdf, png, etc
 
 graph matrix health14 age14, by(ethnic14, total)
 /* Self-reported health and validated age by provinces*/
-
 gr export graph141.png, replace  //pdf, png, etc
 
 graph matrix health14 income14, by(rural14, total)
