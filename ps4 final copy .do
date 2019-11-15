@@ -450,13 +450,17 @@ regplot, sep(major14)
 reg Health14 income14 , robust
 scatter Health14 income14 ,ml(ethnic14)
 
+
 /*****************/
 /* Visualizing data*/
 /*****************/
+/* Sulman
+The variable you can play with are: dependent (health14 function14) ; independent ( income14 education14 employment14 ); 
+control (smoking14 marital14 familysize14 sex14).
+*/
 
 *Start to visualize the data 
-tab ethnic14
-sum age14
+
 hist age14, frequency normal
 *validated age with frequncy 
 gr export graph1.png, replace  //pdf, png, etc
@@ -464,114 +468,144 @@ gr export graph1.png, replace  //pdf, png, etc
 hist income14,normal
 gr export graph2.pdf, replace  //pdf, png, etc
 
-histogram Health14, discrete freq addlabels xlabel(0 1(1)9,valuelabel)
-*Here we see the breakdown of self-reported health their respective breakdown
-gr export graph3.png, replace  //pdf, png, etc
+twoway (bar health14 rural14, sort), by(rural14, total) subtitle(, size(medium))
+/* This is a very important graph. It suggest that people who live in rural areas
+self-reported better health than those who were living in city and town. */
 
-histogram ethnic14, discrete freq addlabels xlabel(0 1,valuelabel)
-*ethnic grup breakdown
-gr export graph4.png, replace  //pdf, png, etc
+graph bar (mean) Health14, over(major14) blabel(bar) by(rural14, total)
+ /* Majority in the city city have better health. 
+ However,  Han (majority) elderly living in an urban area  have better 
+ health status than the minorities in an urban area. Third hypothesis states that 
+ the Han (majority) elderly living in a rural area have a better health status 
+ than the minorities in an urban area--that is true as well but marginal differnce.
+ The minorities elderly living in an urban area do not have a better self-health status than 
+ those in a rural area- it is the opposite in which rural minority are doing better.
+ Note the interpretation are purely based on graph and may be diffrent if we run regression. Also it is pertinent to 
+ mention that frequency is diffrent for the rural and urban participant so it may
+ have an impact on the mean of the variables. */
+ 
+ graph bar (count), over(major14) blabel(bar) by(rural14, total)
+ /*Where does majority predominatly lives? Primarily rural area.
+ According to the graph there are only 495 people out of sample of 6635 people.
+ That is fine as according Chinenese census data minority are only 
+ 8.49% of the population (NBS Census, 2010). In our data over 7% of the people are 
+ minority. */
 
-histogram rural14, discrete freq addlabels 
-*breakdown of city, town and rural 
-gr export graph4.png, replace  //pdf, png, etc
+graph box age14, over(ethnic14)title(Age Dispersion By Ethnicity)
+/*clever graph with age dispersion by ethnicity. Han appears to have the largest
+age dispersion while Korean and Mangolian appear to have smallest disperion
+that is understandble as there is only one Koreans  ...COOL.*/ 
+gr export graph15.png, replace  //pdf, png, etc
 
-histogram income14, discrete freq addlabels 
-gr export graph5.png, replace  //pdf, png, etc
-
-histogram education14, discrete freq addlabels 
-gr export graph7.png, replace  //pdf, png, etc
-
-histogram employment14, discrete freq addlabels
-*paid enagement post job
-gr export graph8.png, replace  //pdf, png, etc 
-
-histogram age14, frequency by(rural14)
+histogram age14, frequency by(rural14)  title(Age Dispersion By Region)
 gr export graph9.png, replace  //pdf, png, etc
 
-hist Health14, frequency by(rural14)
-gr export graph10.png, replace  //pdf, png, etc
+graph hbar Health14, over(PROV) bargap(50) title(Self-reported health by provinces)
+*Mean of self-reported health by provinces...most provinces above or at 3. Cool
+gr export graph17.png, replace  //pdf, png, etc
 
-hist Health14, frequency by(sex14)
+histogram Health14, discrete frequency lcolor(magenta) lalign(outside) horizontal addlabel by(, title(Overall Self-Reported Health)) by(Health14)
+/*Here we see the breakdown of self-reported health their respective breakdown 
+Mostly so so and good. Cool*/
+
+
+histogram rural14, discrete frequency lcolor(magenta) lalign(outside) horizontal addlabel by(, title(Population Breakdown)) by(rural14, total)
+*Where are the participants from? Mostly rural area.
+gr export graph4.png, replace  //pdf, png, etc
+
+
+scatter income14 education14 if education14 < 60 || lfit  income14 education14 if education14 < 60, title(Income and EDU Relationship)
+*Does education has impact on income? Yes it is and that is what we expected. 
+gr export graph7.png, replace  //pdf, png, etc
+
+graph bar (count), over( employment14) title(Are you still enaged in paid job after retiring?)
+*Are most people enaged in paid job after retiring? NO
+gr export graph8.png, replace  //pdf, png, etc 
+
+
+graph hbar (count), over(sex14) nofill cw blabel(total) by(Health14, total)
+/*Self-reported health by sex...females reported better health in the agregate
+it is well known that female play major role in caregiving perhaphs that has a positive
+impact on their health. */
 gr export graph11.png, replace  //pdf, png, etc
 
 hist function14, frequency by(sex14)
+*functioning capacity of the female is better than the male
 gr export graph14.png, replace  //pdf, png, etc
 
 *Group Statistic 
 tab rural14, sum (age14)
 tab ethnic14, sum (age14)
 tab rural14, sum (Health14)
-tab Health14, sum (rural14)
 histogram Health14 , normal
+*most people said so so and good for health
 
-twoway histogram Health14 , discrete freq by(rural14)
+twoway histogram Health14 , discrete freq by(rural14) 
+*participants by health by region and their distribution 
 gr export graph13.png, replace  //pdf, png, etc
 
 twoway histogram Health14 , discrete freq by(ethnic14)
+*Health by ethnicity 
+gr export graph14.png, replace  //pdf, png, etc
+***********************below*******
+twoway histogram age14 , discrete freq by(rural14) by(rural14, total)
 gr export graph14.png, replace  //pdf, png, etc
 
-twoway histogram age14 , discrete freq by(rural14)
-gr export graph14.png, replace  //pdf, png, etc
+histogram age14, normal
+*age distribution it appears mean of age is around 85
 
 twoway histogram age14 , discrete freq by(ethnic14)
 gr export graph14.png, replace  //pdf, png, etc
 
 twoway histogram function14 , discrete freq by(ethnic14)
 gr export graph14.png, replace  //pdf, png, etc
+*descrpitive 
 
 twoway histogram function14 , discrete freq by(rural14)
 gr export graph14.png, replace  //pdf, png, etc
+*descriptive 
 
-tw(scatter Health14 age14)(lfit Health14 age14)
-twoway (scatter Health14 age14) if age14>65
+tw(scatter health14 age14)(lfit health14 age14)
+twoway (scatter Health14 age14) if age14>65|| lfit Health14 age14, title(Age and Health Assocation Over 65)
 twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small))
-twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age)
-twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) title(the relationship between health and age) legend(on)
-twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age)) ///
-by(, legend(on)) by(rural14, total)
+
+scatter Health14 age14 || lfit Health14 age14, title(Age and Health)
+*increasing age associated with poorer health as the line of best fit declining
+
+twoway (scatter Health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age regionally)) by(, legend(on)) by(rural14, total)
 gr export graph25.png, replace  //pdf, png, etc
 
-twoway (scatter Health14 income14) (lfit Health14 income14)
+twoway (scatter Health14 income14) (lfit health14 income14)
+* negative relationship appears  between health and income in other words weak
 
-histogram age14, discrete freq by( ethnic14 , total)
+histogram age14, discrete freq by( ethnic14 , total) 
+*check distribution of the data
 
-reg age14 ethnic14 rural14
-scatter age14 ethnic14 || lfit age14 ethnic14
-gr export graph15.png, replace  //pdf, png, etc
-
-scatter Health14 education14 || lfit Health14 education14
-*negative realtionship b/w health and years of schooling
-gr export graph16.png, replace  //pdf, png, etc
-
-tabstat Health14 , by( ethnic14 ) stat(mean sd min max) nototal long format
-tabstat age14 , by( rural14 ) stat(mean sd min max) nototal long format
-
-graph hbar Health14, over(PROV) bargap(50)
-*Mean of self-reported health by provinces
-gr export graph17.png, replace  //pdf, png, etc
 
 symplot age14 
 gr export graph18.png, replace  //pdf, png, etc
+*dispersion of data below and above mean**
 
 symplot income14
 gr export graph19.png, replace  //pdf, png, etc
 
 symplot marital14
 gr export graph20.png, replace  //pdf, png, etc
+* Bin what's this?
 
-graph matrix Health14 age14, by(ethnic14, total)
+graph matrix health14 age14, by(ethnic14, total)
 /* Self-reported health and validated age by provinces*/
+
 gr export graph141.png, replace  //pdf, png, etc
 
-graph matrix Health14 income14, by(rural14, total)
+graph matrix health14 income14, by(rural14, total)
 gr export graph142.png, replace  //pdf, png, etc
 
 qnorm age14, grid
 gr export graph23.png, replace  //pdf, png, etc
+* Bin what's this?
 
-tab ethnic14 , sum (age14)
-graph matrix Health14 income14 education14 employment14 sex14 marital14, half maxis(ylabel(none) xlabel(none))
+graph matrix health14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 gr export graph24.png, replace  //pdf, png, etc
 graph matrix function14 income14 education14 employment14, half maxis(ylabel(none) xlabel(none))
 gr export graph25.png, replace  //pdf, png, etc
