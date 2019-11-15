@@ -15,7 +15,8 @@
 Data came from the Chinese Longitudinal Healthy Longevity Survey (CLHLS), released by 
 the National Archive of Computerized Data on Aging in 2017. The CLHLS surveys 
 include seven waves of data which are released in 1998, 2000, 2002, 2005, 2008, 2010 
-and 2014 respectively. The CLHLS provides information on health status and quality of 
+and 2014 respectively. The CLHLS provides in
+mation on health status and quality of 
 life of the elderly aged 65 and older in China,included socioeconomic characteristics, 
 family, lifestyle, and demographic profile of this aged population. A national representative 
 sample of people aged 65 or older was drawn. The dataset covers 23 out of 31 provinces in China, 
@@ -324,11 +325,6 @@ local control smoking14 marital14 familysize14 sex14
 local varin income14 education14 employment14 age14
 display "`control'"
 display "`varin'"
-
-
-foreach s in "rural14 "  "rural14 ethnic14" "rural14 ethnic14  income14 education14 employment14"{
-reg Health14 `s'
-}
 
 reg Health14 rural14 
 reg Health14 rural14 ethnic14
