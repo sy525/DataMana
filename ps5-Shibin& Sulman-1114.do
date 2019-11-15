@@ -280,6 +280,7 @@ bys ethnic14: egen meanage=mean(age14)
 /* we would liek to know the mean of elderly age from different ethnicity groups. So we creat
 the meanage14 variable. The result shows that 97 Han majority people live as long as 89 years.
  */
+la var meanage "mean elderly age"
 
 
 tab rural14
@@ -288,7 +289,23 @@ tab age14
 //Gives break down of how many people are there by age. 
 
 tab ethnic14
+//Break of ethnicity and it appears that han is where 94% of interviewee are from
 
+
+graph bar (sum) happiness14, over(rural14) by(happiness14)
+/* Graph by region and whether they happier if were younger.*/
+
+graph pie [pweight = rural14], over(rural14) sort(rural14)
+*Breakdown of population in pie chart. 
+
+sum age14
+*average age 85
+
+tab  sex14
+*about 500 more females in the dataset than male
+
+tab marital14
+*58% of people widowed and 39% currently married and not surprising  less 1 never married
 
 tabstat Health14 income14 education14 employment14 , by(rural14) 
 tabstat Health14 income14 education14 employment14 , by(rural14)  nototal long col(stat)
