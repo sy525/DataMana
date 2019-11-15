@@ -610,46 +610,6 @@ graph matrix function14 income14 education14 employment14, half maxis(ylabel(non
 gr export graph25.png, replace  //pdf, png, etc
 
 
-/// Loops
-
-codebook marital14
-codebook rural14
-levelsof marital14, loc(marital14)
-di "`marital'"
-levelsof rural14, loc(m1)
-levelsof marital14, loc(r1)
-foreach m of local m1 {
-       foreach r of local r1 {
-              tab income14 if marital14 == `m' & rural14 == `r'
-       }
-}
-
-
-foreach var of varlist income12 {
-  rename `var' `var'20 
-}
-
-levelsof marital14, loc(r2)
-foreach m of local r2 {
-di `m'
-}
-
-//-----------------Violation------------------------------------------------
-use merge5, clear
-reg Health14 Urban14 
-predict Healthhat
-graph twoway (scatter Health14 Urban14 ) (line Health14 Urban14, sort)
-graph twoway (scatter Health14 Urban14) (lfit Health14 Urban14)
-reg Health14 Urban14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
-rvfplot, yline(0)
-gr export g1.eps, replace
-
-estat hettest
-estat imtest
-estat szroeter, rhs
-//looks like if we regress on urban there is less heteroskedascity.
-
-
 
 /*****************/
 /*Outreg*/
