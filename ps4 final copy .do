@@ -42,6 +42,10 @@ and ethnicity disparity on the health outcome of the Chinese elderly.
 2. Does the elderly living in urban area live longer than their counterpart in rural area?
 */
 
+/* great research questions,also see my https://www.tandfonline.com/doi/abs/10.1080/13674670903273801
+but definition or majority can be also more specific--per province, so in addition to natl majority, can look at regional ones
+*/
+
 /* Hypothesis 
 Hypothesis 1: The Han (majority) elderly living in an urban area have a better health status than those in a rural area. 
 Hypothesis 2: The Han (majority) elderly living in an urban area have a better health status than the minorities in an urban area. 
