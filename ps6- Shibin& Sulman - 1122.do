@@ -73,9 +73,47 @@ The Controls will include the factors that would have an impact on the relations
 the health status of Chinese elderly. These control variables are variables: gender, marital status, family members.  
 */
 
+/* Literature Review
+Geographic health disparity is widespread in China, especially evident in the older population. A
+lot of interesting studies has demonstrated that older people from urban areas can access more
+health care resources than their rural counterparts (Rodgers, 1979; Feng &amp; Yu, 2007; Evandrou
+et al., 2014; Li et al., 2018). Some claim that the unequal distribution of health resources is a
+major contributor (Hsiao, 1995; Kanbur &amp; Zhang, 2009; Li et al.,2018). Health resources, such
+as community health centers, health facilities, nursing homes, professional doctors are
+concentrated in urban settings. Numerous health programs for elderly which are funded by local
+governments are located in urban areas. Generally, the urban elderly receive high-quality health
+service. In contrast, older people in rural area confront many barriers to access to health service.
+One of the barriers is that the caregivers are unwilling to work in rural areas due to the
+impoverished living conditions (Yang et al., 2012). Other barriers are worsening income
+inequality between these two regions (Grossman, 1972; Rodgers, 1979; Wilkinson, 1996;Subramanian &amp; 
+Kawachi, 2004; Feng &amp; Yu, 2007). It is known that both income growth and
+income inequality influence an individual’s health condition (Grossman, 1972; Feng &amp; Yu,
+2007). The income per person in the urban region is higher than that of the rural region.
+According to the National Bureau of the statistic of China, per capita disposable income in rural
+households is $1945 while $5272 in the urban household in 2017 (NBS, 2017). With less
+financial support, the health resource that distributes to rural elderly is very limited. Moreover,
+compared to urban elderly, rural elderly are lack of pension and have to pay higher compartment
+of service, which keep them away from the better senior care service. According to the National
+Bureau of the statistic of China in 2017, about 60% of rural elders cannot access adequate health
+care service because of the financial issue (NBS, 2017). Many of them are more likely to receive
+self-treatment rather than inpatient service than urban counterparts (Wang, 2014).
+	China has 56 official ethnic groups—55 ethnic minority groups and the Han majority. According
+to the 2010 Chinese Census, the dominant Han makes up 91.51% of the total population and 55
+ethnic minority groups just account for 8.49% (NBS, 2010). The ethnic minorities are different from 
+the Han majority on culture, customs, genetic backgrounds, geographic location and
+languages (Guan, 2015). Because of historical reasons, the ethnic minority communities are
+more concentrated in the mountain area where economic development is hindered (Ouyang &amp;
+Andersen, 2012; Liu et al., 2007; Cao 2010 ). Plus, to support the ethnic minority communities,
+the Chinese government has set up five minority autonomous regions, which has the highest
+minority ethnic population. In addition, with the rapid development of Chinese economic, the
+income gap between the Han majority and the minority have widened since the unbalanced
+regional economic growth in China (Gustafsson et al., 2003). Constraint by finance, ethnic
+minorities that tend to live in the less developed geographic region has poorer health status than
+the Han majority (Liu, 2007).
+*/ 
+
 
 //////////////////////Project Start////////////////////////
-
 clear
 set more off
 version 15
@@ -128,7 +166,6 @@ display "`idvar'"
 keep  age14 rural14 sex14 `idvar' ethnic14 happiness14 marital14 born14 health14 income14  employment14 education14 ///
 familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 ///
 cooking14 washing14 walking14 carrying14 A542A
-
 
 * Factor Analysis 
 factor feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 bathing14 dressing14 ///
@@ -205,6 +242,11 @@ save eld2.dta, replace
 /* Merging data*/
 /*****************/
 
+/*need to merge two more datasets. For this project, it'd better to conbine the data
+set with the data from different years/ waves, such as the CLHLS 2008. By doing that, 
+we will have more observations on minority groups.
+*/
+
 /*merge1*/ 
 use eld2, replace
 sort ID
@@ -229,7 +271,6 @@ that elderly living in the city area will have a better life expectancy or healt
 counterpart in the rural area. These are several observations of data we found can support the hypothesis. 
 The reshape can help us easier to compare the data, especially a large dataset. 
 */
-
 *append using merge1
 
 /*merge2*/
@@ -291,7 +332,6 @@ the meanage14 variable. The result shows that 97 Han majority people live as lon
  */
 la var meanage "mean elderly age"
 
-
 tab rural14
 //Shows the break down of the interviewee's geograpic location\\
 tab age14
@@ -319,9 +359,10 @@ tabstat Health14 income14 education14 employment14 , by(rural14)
 tabstat Health14 income14 education14 employment14 , by(rural14)  nototal long col(stat)
 
 ///Using outreg2 to export summary statistics of all variables in dataset.
-outreg2 using des.doc, replace sum(log) keep(Health14 function14 rural14 ethnic14  income14 education14 employment14 age14 ///
+outreg2 using des.doc, replace sum(log) keep(Health14 function14 rural14 ethnic14 age14 income14 education14 employment14 ///
 smoking14 marital14 familysize14 sex14)
 
+///remember that 99 or 999 is the number for missing value. Sometimes we need to get rid of it. 
 
 /*****************/
 /* Regression */
@@ -417,8 +458,9 @@ more chance to exposure to nature enviornment than their counterparts in city. S
 
 /// look deep on the strong relationship between health and income.
 gen logincome = log(income14) 
+gen income14_1 = income14/10000
 regress Health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14,robust
-
+regress Health14 rural14 ethnic14 income14_1 education14 employment14 smoking14 marital14 familysize14 sex14,robust
 ///////////////////////////// Interaction ////////////////////////////////
 
 /* We argue that the ethnic division between these two groups reflects their historical and
@@ -468,7 +510,12 @@ outreg2 using reg13.xls
 /////////////////
 reg Health14 ethnic14 income14 i.ethnic14##c.income14, baselevels
 reg Health14 ethnic14 income14 i.ethnic14##c.income14, robust
+reg Health14 ethnic14 income14 i.ethnic14##c.income14 i.ethnic14##c.education14 i.ethnic14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
+reg Health14 Urban14 income14 i.Urban14##c.income14 i.Urban14##c.education14 i.Urban14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
 outreg2 using reg20.xls,replace 
+reg Health14 i.Urban14##c.income14 smoking14 marital14 sex14 familysize14 age14, robust
+outreg2 using reg23.xls,replace 
+///question: how to interpret the aboved regresion?
 ////////////////
 
 xi: regress function14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
@@ -494,6 +541,15 @@ gen ethe = education14 * major14
 regress Health14 education14 major14 ethe
 regplot, by(major14)
 regplot, sep(major14)
+
+/////marginplot
+reg Health14 sex14##c.age14
+
+margins sex14#age14, asbalanced
+marginsplot, noci
+
+
+
 
 // Robust Check
 reg Health14 income14 , robust
@@ -662,8 +718,20 @@ graph matrix function14 income14 education14 employment14, half maxis(ylabel(non
 gr export graph25.png, replace  //pdf, png, etc
 
 
-/// Loops
 
+/*
+replace income14=income14/1000
+reg Health14 rural14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
+sum income14
+replace income14=income14/1000
+sum income14
+reg Health14 rural14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14
+reg Health14 rural14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14, beta
+*/
+
+
+
+/// Loops
 codebook marital14
 codebook rural14
 levelsof marital14, loc(marital14)
