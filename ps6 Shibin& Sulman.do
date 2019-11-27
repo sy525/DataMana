@@ -818,7 +818,6 @@ estat szroeter, rhs
 /*****************/
 /* Modeling Health*/
 /*****************/
-
 *export model1
 
 use eldfinal, clear
