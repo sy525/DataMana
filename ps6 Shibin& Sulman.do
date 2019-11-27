@@ -172,7 +172,9 @@ keep  age14 rural14 sex14 `idvar' ethnic14 happiness14 marital14 born14 health14
 familysize14 smoking14 bathing14 dressing14 toileting14 transfer14 continen14 feeding14 visiting14 shopping14 ///
 cooking14 washing14 walking14 carrying14 A542A
 
-* Factor Analysis 
+* Factor Analysis //very nice lets discuss more in person per interpretation,can also display just big loadings say bigger than .4
+//for ease of interpretation as i did here
+//https://www.sciencedirect.com/science/article/pii/S0921800907002650
 factor feeding14 visiting14 shopping14 cooking14 washing14 walking14 carrying14 bathing14 dressing14 ///
 toileting14 transfer14 continen14,ipf factor(2)
 rotate, varimax horst
@@ -272,11 +274,14 @@ use merge1,clear
 decode PROV, g(PROV1)
 replace PROV1 = proper(PROV1)
 save merge2, replace
+//this chunk should be glued to earlier!
+
+
 import excel "https://docs.google.com/uc?id=14owWYRQ4O8GYwoN8VWVsyUyY1ke9KlwF&export=download", sheet("Sheet1") firstrow clear
-keep in 1/31
+keep in 1/31 //no need to do that
 rename PROV PROV1
 merge 1:m PROV1 using merge2, nogen 
-save merge3, replace 
+save merge3, replace //here and elsewhere, dont name them merge1 2 3 and so on, give susbtsative name as per what that dataset means!
 sort _merge
 list PROV1 if _merge==1
 list PROV1 if _merge==2
@@ -307,6 +312,8 @@ save eldfinal, replace
 *list PROV1 if _merge==1 | _merge==2
 /* A lot of non-merge happen in the using dataset because there are a lot of missing value of PROV1 variable in 
 the using dataset. */
+
+//so again and again, need more merges and more data; otherwhise almost there!
 
 /*
  /*merge4*/
@@ -379,6 +386,8 @@ keep ID MONTHIN DAYIN TYPE PROV age08 rural08 sex08 ethnic08 happiness08 marital
 employment08 education08 familysize08 smoking08 bathing08 dressing08 toileting08 transfer08 continen08 feeding08 visiting08 shopping08 cooking08 washing08 walking08 carrying08 
 merge 1:1 ID using c2008,nogen
 */
+
+//again try to merge more data as per our inclass discussion yesterday or perhaps do another study for pakistan
 
 /********************/
 /*descriptive statistics*/
