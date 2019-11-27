@@ -719,7 +719,9 @@ outreg2 using reg13.xls
 /// we can use the marginplot to see the effect of urban ana rural on health.
 /// we can also use "replace income14= income14/1000" or we can add beta after the regression line.
 
-/////////////////
+
+///////////////// 
+Sulman: try to use marginsplot to the below interaction.
 reg rev_health14 ethnic14 income14 i.ethnic14##c.income14, baselevels
 reg rev_health14 ethnic14 income14 i.ethnic14##c.income14, robust
 reg rev_health14 ethnic14 income14 i.ethnic14##c.income14 i.ethnic14##c.education14 i.ethnic14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
@@ -758,7 +760,6 @@ scatter rev_health14 income14 ,ml(ethnic14)
 
 
 /// Loops
-
 codebook marital14
 codebook rural14
 levelsof marital14, loc(marital14)
