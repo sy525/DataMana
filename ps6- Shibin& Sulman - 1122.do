@@ -177,10 +177,15 @@ egen function14 = rowmean(factor1 factor2)
 /// Question: how to explain the negative value of function14?
 
 * recode the rural variable
+
 recode rural14 (3=0) (1 2=1) (-99=.),gen(Urban14) 
 la de urbanlab 0 "Rural" 1 "Urban"
 la val Urban14 urbanlab
 label list urbanlab
+
+recode rural14 (3=0 "rural") (1 2=1 "urban") (-99=.),gen(Urban14) 
+
+
 * recode the ethnicity variable
 recode ethnic14  (1=0) (2 3 4 5 6 7 8=1),gen(major14) 
 la de ethniclab 0 "majority" 1 "minority"
@@ -191,6 +196,8 @@ la de maritallab 0 "single" 1 "spouse"
 la val spouse14 maritallab
 
 recode health14 (5=1) (4=2)(3=3)(2=4) (1=5)(8 9 .=.),gen(Health14) 
+revrs health14, replace
+
 la de healthlab 1 "very bad" 2 "bad" 3 "so so" 4 "good" 5 "very good"
 la val Health14 healthlab
 label list healthlab
@@ -555,6 +562,7 @@ marginsplot, noci
 reg Health14 income14 , robust
 scatter Health14 income14 ,ml(ethnic14)
 
+//shouldnd do inferential stats with descriptive stats
 
 /*****************/
 /* Visualizing data*/
