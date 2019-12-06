@@ -117,18 +117,18 @@ the health status of the Chinese elderly. These control variables are variables:
 
 /* Limitations
 This study is the first to explore the impact of geographic and ethnic health disparity on the health
- of the Chinese elderly. As exploratory research, there are limitations that need to be identified. 
- First, despite the CLHL surveys included data on five minority autonomous regions, but the sample size 
- from these regions are small. Only 7% of the sample is reported as an ethnic minority. The small sample 
- size would compromise the representativeness of the sample and decrease the internal validity of the 
- research.  Internal validity cannot be established since the findings may not be generalized to 
- other settings because of the small sample size (Bhattacherjee, 2012). Consequently, our findings 
- might not apply to the large ethnic population. Second, health disparity is a complex issue, and 
- the measurement of health disparity is a big challenge for the study. Even though SES is commonly 
- used as the measurement of health disparity, the concept of SES includes a variety of factors, such 
- as children income level, parents income. It is insufficient to apply a few factors to measure health 
- disparity (Dehlendorf et al.,2010). Simplification of the health disparity cannot reflect the complexity
- of the reality in the ethnic and geographical health disparity among Chinese elderly. 
+of the Chinese elderly. As exploratory research, there are limitations that need to be identified. 
+First, despite the CLHL surveys included data on five minority autonomous regions, but the sample size 
+from these regions are small. Only 7% of the sample is reported as an ethnic minority. The small sample 
+size would compromise the representativeness of the sample and decrease the internal validity of the 
+research.  Internal validity cannot be established since the findings may not be generalized to 
+other settings because of the small sample size (Bhattacherjee, 2012). Consequently, our findings 
+might not apply to the large ethnic population. Second, health disparity is a complex issue, and 
+the measurement of health disparity is a big challenge for the study. Even though SES is commonly 
+used as the measurement of health disparity, the concept of SES includes a variety of factors, such 
+as children income level, parents income. It is insufficient to apply a few factors to measure health 
+disparity (Dehlendorf et al.,2010). Simplification of the health disparity cannot reflect the complexity
+of the reality in the ethnic and geographical health disparity among Chinese elderly. 
 */
 
 /* references 
@@ -251,7 +251,8 @@ rename E14 carrying12
 local idvar ID YEARIN MONTHIN DAYIN TYPE PROV
 display "`idvar'"
 keep `idvar' age12 rural12 sex12 ethnic12 happiness12 marital12 born12 health12 income12 /// 
-employment12 education12 familysize12 smoking12 bathing12 dressing12 toileting12 transfer12 continen12 feeding12 visiting12 shopping12 cooking12 washing12 walking12 carrying12 A542A
+employment12 education12 familysize12 smoking12 bathing12 dressing12 toileting12 transfer12 ///
+continen12 feeding12 visiting12 shopping12 cooking12 washing12 walking12 carrying12 A542A
 save eld2.dta, replace
 
 /*****************/
@@ -288,7 +289,7 @@ The reshape can help us easier to compare the data, especially a large dataset.
 */
 
 /*merge2*/
-use merge1,clear
+use clhwave.dta,clear
 decode PROV, g(PROV1)
 replace PROV1 = proper(PROV1)
 save merge2, replace
@@ -319,7 +320,7 @@ collapse (mean) AGE , by(PROV1)
 save agemeg,replace
 *Data from Research on Early Life and Aging Trends and Effects: A Cross-National Study 1996-2008 https://www.icpsr.umich.edu/icpsrweb/DSDR/studies/34241.
 
-merge 1:m PROV1 using merge3, nogen
+merge 1:m PROV1 using yearmge, nogen
 sort PROV1
 list PROV1 if _merge==1
 list PROV1 if _merge==2
@@ -330,75 +331,21 @@ the using dataset. */
 
 /*
  /*merge4*/
-use "https://docs.google.com/uc?id=1HX_58WquP_nxap9KieR1VAUMhg9a4sV7&export=download",clear
-rename TRUEAGE age10
-rename RESIDENC rural10
-rename A1 sex10
-rename A2 ethnic10
-rename B27 happiness10
-rename F41 marital10
-rename A41 born10
-rename B12 health10
-rename F35 income10
-rename F23 employment10
-rename F1 education10
-rename A52 familysize10
-rename D71 smoking10
-rename E1 bathing10
-rename E2 dressing10
-rename E3 toileting10
-rename E4 transfer10
-rename E5 continen10
-*E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
-rename E6 feeding10
-rename E7 visiting10
-rename E8 shopping10
-rename E9 cooking10
-rename E10 washing10
-rename E11 walking10
-rename E12 carrying10
-keep ID YEARIN MONTHIN DAYIN TYPE PROV age10 rural10 sex10 ethnic10 happiness10 marital10 born10 health10 income10 /// 
-employment10 education10 familysize10 smoking10 bathing10 dressing10 toileting10 transfer10 continen10 feeding10 visiting10 shopping10 cooking10 washing10 walking10 carrying10 
- 
-save c2008.dta,replace
-merge 1:1 ID using healthfinal,nogen
-* question: why it does not work?
-*/
-
-/*
- /*merge5*/
-use "https://docs.google.com/uc?id=13lo_bsO5ur70VJiZXx6pNdY67AHVbLTH&export=download",clear
-
-rename TRUEAGE age08
-rename RESIDENC rural08
-rename A1 sex08
-rename A2 ethnic08
-rename B27 happiness08
-rename F41 marital08
-rename A41 born08
-rename B12 health08
-rename F35 income08
-rename F23 employment08
-rename F1 education08
-rename A52 familysize08
-rename D71 smoking08
-rename E1 bathing08
-rename E2 dressing08
-rename E3 toileting08
-rename E4 transfer08
-rename E5 continen08
-*E1 to E5 is the variables which use to measure elderly's activities of daily living (ADLs).
-rename E6 feeding08
-rename E7 visiting08
-rename E8 shopping08
-rename E9 cooking08
-rename E10 washing08
-rename E11 walking08
-rename E12 carrying08
-keep ID MONTHIN DAYIN TYPE PROV age08 rural08 sex08 ethnic08 happiness08 marital08 born08 health08 income08 /// 
-employment08 education08 familysize08 smoking08 bathing08 dressing08 toileting08 transfer08 continen08 feeding08 visiting08 shopping08 cooking08 washing08 walking08 carrying08 
-merge 1:1 ID using c2008,nogen
-*/
+ use "https://docs.google.com/uc?id=1Sb_fGGdRiVSxFpcfHbp7RaV2QauGxi_q&export=download",clear
+rename RESIDENC residence
+rename A43 birthplace
+recode birthplace (3=0 "Rural") (1 2=1 "Urban") (-99=.)
+save merge10,replace
+use "https://docs.google.com/uc?id=1jrGlyM9tmOy9OtILTxuLnJhJuqgPdTvC&export=download",clear
+rename Q0104 rural
+rename Q0811 educ
+recode educ (-8=.)
+egen averural=mean(educ), by(rural)
+collapse educ, by(rural)
+save rural1,replace
+merge 1:m rural using merger10, nogen 
+* Data from WHO Study on Global AGEing and Adult Health 2007-2010 https://www.who.int/healthinfo/sage/en/.
+*/ 
 
 /********************/
 /*descriptive statistics*/
@@ -422,6 +369,8 @@ tab rural14
 tab age14
 //Gives break down of how many people are there by age. 
 
+tab meanage
+
 tab ethnic14
 //Break of ethnicity and it appears that han is where 94% of interviewee are from
 
@@ -435,7 +384,8 @@ tabstat rev_health14 income14 education14 employment14 , by(rural14)
 tabstat rev_health14 income14 education14 employment14 , by(rural14)  nototal long col(stat)
 
 ///Using outreg2 to export summary statistics of all variables in dataset.
-outreg2 using des.doc, replace sum(log) keep(rev_health14 function14 rural14 ethnic14 age14 income14 education14 employment14 ///
+outreg2 using des.doc, replace sum(log) keep(rev_health14 function14 rural14 ethnic14 ///
+age14 income14 education14 employment14 ///
 smoking14 marital14 familysize14 sex14)
 
 ///remember that 99 or 999 is the number for missing value. Sometimes we need to take care of it. 
@@ -484,23 +434,24 @@ graph box age14, over(ethnic14)title(Age Dispersion By Ethnicity)
 age dispersion while Korean and Mangolian appear to have smallest disperion
 that is understandble as there is only one Koreans  ...COOL.*/ 
 gr export graph15.png, replace  
-
-histogram age14, frequency by(rural14)  title(Age Dispersion By Region)
-gr export graph9.png, replace  
+ 
 
 graph hbar rev_health14, over(PROV) bargap(50) title(Self-reported health by provinces)
 *Mean of self-reported health by provinces...most provinces above or at 3. Cool
 gr export graph17.png, replace  
 
-histogram rev_health14, discrete frequency lcolor(magenta) lalign(outside) horizontal addlabel by(, title(Overall Self-Reported Health)) by(rev_health14)
+histogram rev_health14, discrete frequency lcolor(magenta) lalign(outside) horizontal ///
+addlabel by(, title(Overall Self-Reported Health)) by(rev_health14)
 /*Here we see the breakdown of self-reported health their respective breakdown 
 Mostly so so and good. Cool*/
 
-histogram rural14, discrete frequency lcolor(magenta) lalign(outside) horizontal addlabel by(, title(Population Breakdown)) by(rural14, total)
+histogram rural14, discrete frequency lcolor(magenta) lalign(outside) horizontal ///
+addlabel by(, title(Population Breakdown)) by(rural14, total)
 *Where are the participants from? Mostly rural area.
 gr export graph4.png, replace  
 
-scatter income14 education14 if education14 < 60 || lfit  income14 education14 if education14 < 60, title(Income and EDU Relationship)
+scatter income14 education14 if education14 < 60 || lfit  income14 education14 ///
+if education14 < 60, title(Income and EDU Relationship)
 *Does education has impact on income? Yes it is and that is what we expected. 
 gr export graph7.png, replace  
 
@@ -532,7 +483,7 @@ gr export graph13.png, replace
 twoway histogram rev_health14 , discrete freq by(ethnic14)
 *Health by ethnicity 
 gr export graph14.png, replace  
-***********************below*******
+***********************below************
 twoway histogram age14 , discrete freq by(rural14) by(rural14, total)
 gr export graph14.png, replace  
 
@@ -541,14 +492,6 @@ histogram age14, normal
 
 twoway histogram age14 , discrete freq by(ethnic14)
 gr export graph14.png, replace  
-
-*twoway histogram function14 , discrete freq by(ethnic14)
-*gr export graph14.png, replace 
-*descrpitive 
-
-*twoway histogram function14 , discrete freq by(rural14)
-*gr export graph14.png, replace  
-*descriptive 
 
 tw(scatter rev_health14 age14)(lfit rev_health14 age14)
 /* the graphy tells us that the relationship between health and age is positive. In other words, 
@@ -563,7 +506,9 @@ observation.
 scatter rev_health14 age14 || lfit rev_health14 age14, title(Age and Health)
 *increasing age associated with poorer health as the line of best fit declining
 
-twoway (scatter rev_health14 age14) if age14>65, ylabel(, labsize(small)) by(, title(the relationship between health and age regionally)) by(, legend(on)) by(rural14, total)
+twoway (scatter rev_health14 age14) if age14>65, ylabel(, labsize(small)) ///
+by(, title(the relationship between health and age regionally)) by(, legend(on)) ///
+by(rural14, total)
 gr export graph25.png, replace  
 
 twoway (scatter rev_health14 familysize14) if familysize14<50
@@ -634,22 +579,23 @@ the worse their health, which is opposite with the literature.
 /// check what's the main determinants of elderly's functioning capacity?
 local control smoking14 marital14 familysize14 sex14
 local varin income14 education14 employment14 age14
-reg function14 happiness14
-reg function14 happiness14 income14 
-reg function14 happiness14 income14 education14 employment14
-reg function14 happiness14 `varin'
-reg function14 happiness14 `varin' `control' , robust
-outreg2 using reg2.xls, onecol bdec(2) st(coef) excel append ct(A7) lab
+reg function14 rural14
+reg function14 rural14 income14 
+reg function14 rural14 income14 education14 employment14
+reg function14 rural14 `varin'
+reg function14 rural14 `varin' `control' , robust
+outreg2 using reg30.xls, onecol bdec(2) st(coef) excel append ct(A6) lab
 /* 
 functioning capacity is another proxy of health status of the elderly. We expect to see that health disparity greately affect
 functioning capacity of the elderly. In A5 column, geographic location and income have more effect on functioning capacity of the
 elderly, as we expected. In A9 column, when we added all predictor variable together, we can find that geographic location, 
 smoking and marital status have a statistical significant effect on functioning capacity. One thing out of our expectation is that the
-relationship marital status and functioning capacity. tend to have a better health! 
+relationship marital status and functioning capacity tend to have a better health! 
 */
 
 /// compare the health status of elderly from different areas to see how geographic location difference affect health.
-xi: regress rev_health14 i.rural14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14,robust
+xi: regress rev_health14 i.rural14 ethnic14 income14 education14 employment14 ///
+smoking14 marital14 familysize14 sex14 age14,robust
 rename _Irural14_2 town
 rename _Irural14_3 rural
 label variable town "town"
@@ -666,45 +612,46 @@ And we don't find correlation between the health of elderly in town and the heal
 ///problem: why the lable of variables did not show in the outreg table?
 
 ///here we would like to check why the elderly in rural area have better health than the elderly in the city. Maybe happiness contribute to that outcome.
-xi: regress rev_health14 i.rural14 ethnic14 income14 education14 employment14 happiness14 smoking14 marital14 familysize14 sex14,robust
+xi: regress rev_health14 i.rural14 ethnic14 income14 education14 employment14 happiness14 ///
+smoking14 marital14 familysize14 sex14,robust
 outreg2 using reg12.doc, replace
 graph bar (mean) happiness14, over(rural14)
+gr export graph155.png, replace
 eststo model2
 esttab, r2 ar2 se scalar(rmse)
 predict rev_health14_predict
 scatter rev_health14 rev_health14_predict
 /* 
-From the regression table, we can see that happiness/ Subjective well-being (SWB) have a significant effect on health of elderly. And then, we can find that elderly in rural
-report a better health than their counterparts in town and city! According to Dr.Adam's SWB theory, nature envrionment make people happier. So elderly in rural areas get
-more chance to exposure to nature enviornment than their counterparts in city. So they tends to become happier. 
+From the regression table, we can see that happiness/ Subjective well-being (SWB) have a significant effect on health of elderly. And then, we can find that elderly in rural report a better health than their counterparts in town and city! According to Dr.Adam's SWB theory, nature envrionment make people happier. So elderly in rural areas get more chance to exposure to nature enviornment than their counterparts in city. So they tends to become happier. 
 */
 
 /// look deep on the strong relationship between health and income.
+*since the value of income is large,so we use log and division to makes it smaller.
 gen logincome = log(income14) 
 gen income14_1 = income14/10000
-regress rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14,robust
-regress rev_health14 rural14 ethnic14 income14_1 education14 employment14 smoking14 marital14 familysize14 sex14,robust
-* it seem that using log and other way to make the value smaller is not so helpful. 
+regress rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
+regress rev_health14 rural14 ethnic14 income14_1 education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
+/* it seem that using log and other way to make the value smaller is helpful for us to 
+observe the effect of income on health. */
+  
 
 
 ///////////////////////////// Interaction ////////////////////////////////
-
 /* We argue that the ethnic division between these two groups reflects their historical and
 sociostructural standing in society and shapes their life experiences. If so, by 
-exploring the interactions between the elders’sociostructural positions and health across ethnicity, additional
-insights into the mechanisms of social inequalities in health might be obtained.
+exploring the interactions between the elders’sociostructural positions and health across ethnicity, 
+additional insights into the mechanisms of social inequalities in health might be obtained.
 */
 
-/*
-Closer scrutiny on the ethnic patterns of health disparities and interactions between 
-ethnicity and elders’sociostructural positions to health may lead to a better understanding 
-of social inequalities in health.
+/* Closer scrutiny on the ethnic patterns of health disparities and interactions between 
+ethnicity and elders’sociostructural positions  may lead to a better understanding 
+of health inequality.
 */
 
-xi: regress rev_health14 i.Urban14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14, robust
+xi: regress rev_health14 i.Urban14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14, robust
 outreg2 using reg12.xls, replace
 
-xi: regress rev_health14 i.ethnic14 Urban14 income14 education14 employment14 smoking14 marital14 familysize14 sex14, robust
+xi: regress rev_health14 i.ethnic14 Urban14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14, robust
 outreg2 using reg13.doc, replace
 /* 
 As we stated in hypothesis, we expect to see that the Han (majority) elderly living have a better health status than the minorities.
@@ -713,19 +660,22 @@ reveals that mongolia and other ethnic group have a better health than majority.
 some ethnic group do better than majority on health but some don't. We need to know the reason of that. 
 */
 
-regress rev_health14 i.ethnic14 i.Urban14 income14#Urban14 Urban14#education14 Urban14#employment14 smoking14 marital14 familysize14 sex14 age14, robust
+*regress rev_health14 i.ethnic14 i.Urban14 income14#Urban14 Urban14#education14 Urban14#employment14 smoking14 marital14 familysize14 sex14 age14, robust
 ///question: what's wrong with the aboved regression?
 /// how to use marginplot? what is the error"factor 'xxx' not found in list of covariates"?
-outreg2 using reg13.xls, replace
+*outreg2 using reg13.xls, replace
 
 reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14,allbaselevels
+reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14,robust
+outreg2 using reg20.doc, replace
+ 
+* Interaction 1
+reg rev_health14 Urban14 i.ethnic14 Urban14#ethnic14 logincome education14 employment14 smoking14 marital14 sex14 familysize14 age14,robust 
+outreg2 using reg29.doc
 
-outreg2 using reg20.doc
-reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14,robust 
-reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14 income14 education14 employment14 smoking14 marital14 sex14 familysize14 age14,robust 
-outreg2 using reg21.doc
-reg rev_health14 i.Urban14##c.familysize14 income14 education14 employment14 smoking14 marital14 , robust beta
-outreg2 using reg13.xls
+/* 
+*/
+
 ///question: how to interpre the interaction aboved? how to operationlize the geographic health disparity? A: the thing we are doing right now is good enough.
 /// how to use outreg2 command to control the column number?  A: the first line use replace but the second and later one use append.
 /// do I need to creat a variable that represent socioeconomic status of the elderly? A: not really.
@@ -733,29 +683,60 @@ outreg2 using reg13.xls
 /// we can use the marginplot to see the effect of urban ana rural on health.
 /// we can also use "replace income14= income14/1000" or we can add beta after the regression line.
 
+
+
 /////////////////
-reg rev_health14 ethnic14 income14 i.ethnic14##c.income14, baselevels
-reg rev_health14 ethnic14 income14 i.ethnic14##c.income14, robust
-reg rev_health14 ethnic14 income14 i.ethnic14##c.income14 i.ethnic14##c.education14 i.ethnic14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
-reg rev_health14 Urban14 income14 i.Urban14##c.income14 i.Urban14##c.education14 i.Urban14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
+reg rev_health14 i.ethnic14##c.income14, baselevels
+* the relationship between income and health is significant from here. we can see the curve. 
+
+reg rev_health14 ethnic14 logincome i.ethnic14##c.logincome, robust
+reg rev_health14 ethnic14 logincome i.ethnic14##c.logincome i.ethnic14##c.education14 i.ethnic14##c.employment14 /// 
+smoking14 marital14 sex14 familysize14 age14, robust
+reg rev_health14 Urban14 logincome i.Urban14##c.income14 i.Urban14##c.education14 i.Urban14##c.employment14 ///
+smoking14 marital14 sex14 familysize14 age14, robust
 outreg2 using reg20.doc,replace 
 
-reg rev_health14 Urban14 income14 Urban14#income14 Urban14#education14 Urban14#employment14 smoking14 marital14 sex14 familysize14 age14, robust
-outreg2 using reg21.doc,replace 
+*reg rev_health14 Urban14 income14 Urban14#income14 Urban14#education14 Urban14#employment14 smoking14 ///
+marital14 sex14 familysize14 age14, robust
+*what is wrong with the aboved regression?
 
-reg rev_health14 major14 income14 i.major14##c.income14 i.major14##c.education14 i.major14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
+reg rev_health14 major14 logincome i.major14##c.income14 i.major14##c.education14 i.major14##c.employment14 ///
+smoking14 marital14 sex14 familysize14 age14, robust
 outreg2 using reg22.doc,replace
 
-*compares to the income from the elderly living in the rural area,  one unit increase in the income from the elderly living in the urban area would cause a   -1.01e-06 decrease in their health outcome
+*compares to the income from the elderly living in the rural area,  one unit increase in the income from the elderly living in the urban area would cause a  -1.01e-06 decrease in their health outcome.
 ////////////////
 
-xi: regress function14 income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
+xi: regress function14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14 age14, robust
 ovtest
 
-
-reg function14 i.rural14##c.income14 education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust beta
+reg function14 i.rural14##c.logincome education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14 age14, robust beta
 
 * use the log for income variable to see the effect.
+
+**********************marginsplot***********
+reg rev_health14 i.rural14##c.income14
+margins rural14,  at(income14=(1(100000)900000))
+marginsplot, x(income14)
+
+reg rev_health14 i.Urban14##c.employment14
+margins Urban14,  at(employment14=(1(10)99))
+marginsplot, x(employment14)
+
+reg rev_health14 i.ethnic14##c.employment14
+margins ethnic14,  at(employment14=(1(5)30))
+marginsplot, x(employment14)
+
+reg rev_health14 i.ethnic14##c.familysize14 
+margins ethnic14,  at(familysize14=(1(5)30))
+marginsplot, x(familysize14)
+
+
+/*
+According to the marginsplot
+*/
+
+////////////////////////////////////////////////////////////////////
 
 reg rev_health14 i. ethnic14
 gen ethage = age14 * ethnic14
@@ -830,7 +811,7 @@ gr export g1.eps, replace
 estat hettest
 estat imtest
 estat szroeter, rhs
-//there is less heteroskedascity?
+//there is less heteroskedascity.
 
 
 
