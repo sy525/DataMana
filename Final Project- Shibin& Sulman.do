@@ -1,3 +1,31 @@
+/*
+file names shouldnt have spaces and especially no special chars like &!
+still many mechanistic comments that should be dropped eg
+/* *then i run some otjer specification */
+/* *and outreg2 again but i append instead of replace */
+earlier regressions do have interpretations, but need to provide interpretation for later ones
+again per regression see 
+https://stats.idre.ucla.edu/stata/webbooks/reg/
+and a bunch of stata slides from
+http://www.princeton.edu/~otorres/
+
+provide substantive interpretations, eg instead of 
+twoway histogram rev_health14 , discrete freq by(rural14) 
+*participants by health by region and their distribution 
+
+should say what you see what's the substantive finding from the graph!
+
+you find heteroskedascity, so it should be corrected in ALL models! just add ',robust'
+
+per factor analysis, name then in a substantive way:
+predict factor1 factor2 
+instead of factor1 and factor2 they should have meaningful name!
+
+still more work to be done, as of now the course grade would be B
+
+
+*/
+
 * Data Management Project- Problem Set 6
 * Shibin Yan & Sulman Saleem, Fall 2019
 * Revised: Fall 2019 Nov.14
