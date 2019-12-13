@@ -115,8 +115,15 @@ the health status of the Chinese elderly. These control variables are variables:
 */
 
 /* Results
-This study aims to assess the impact of geographic (urban/rural) and ethnicity disparity on the health outcome of the Chinese elderly. 
-On the basis of data analysis, it seems that Chinese elderly's health are more likely to be affected by geographic (urban/rural)disparity.
+This study aims to assess the impact of geographic (urban/rural) and ethnicity disparity on the health outcome of the Chinese elderly. On the basis of data analysis, it seems that Chinese elderly's health are more likely to be affected by geographic (urban/rural)disparity and ethnicity. SES indicator is a reliable measurment of health disparity. We finds that different 
+cimponents of SES measures may not produce the same benefit to all ethnici groups. Han, as a majority, benefit the most from
+health resource unbalanced distribution.Turning to another health disparity, the SES indicator shows that rural elderly have
+better health status than urban elderly, which is out of our expected. We looked deeper on the relationship between rural/urban
+difference and health conditions of the elderly. We finds that happiness and famliy size are statiscally significant affecting
+elderly's health. One possible explanation is that elderly become happy to get close to the natural enviornment in rural areas, 
+which in turn improve their health status. In conclusion, geographic and ethnicity health disparity exist in current China and 
+have great impact on elderly's health. More things should be done by the Chinese government to reduce the health disparity and
+make health distribution more equable. 
 */
 
 
@@ -154,7 +161,6 @@ version 15
 net install outreg2, from(http://fmwww.bc.edu/RePEc/bocode/o) 
 *net install regplot, from(http://www.stata-journal.com/software/sj10-1/) 
 *net install reverse, from (http://fmwww.bc.edu/RePEc/bocode/r) 
-///question: where to find the correct sources?
 //////////////////////////////////////////////////////////
 
 /********************/
@@ -264,10 +270,6 @@ save eldsed.dta, replace
 /*****************/
 /* Merging data*/
 /*****************/
-/*need to merge two more datasets. For this project, it'd better to combine the data
-set with the data from different years/ waves, such as the CLHLS 2008. By doing that, 
-we will have more observations on minority groups.
-*/
 
 /*merge1*/ 
 use eldsed, replace
@@ -283,15 +285,6 @@ the reasons for the non-merge is that there are thousands of new observations ad
 the using datasets, and that many observations appeared in the master dataset are not 
 longer appear in the using dataset. Maybe it is because the elderly died or the researchers
 cannot find these elderly for an interview again.  
-*/
-
-*reshape long rural age born happiness, i(ID) j(year)
-/* 
-by reshaping the rural variable, we can see the change on the place of the elderly. It is
-significant to observe the change of living places of the elderly. We would like to test the hypothesis
-that elderly living in the city area will have a better life expectancy or health resources than their
-counterparts in the rural area. These are several observations of data we found can support the hypothesis. 
-The reshape can help us easier to compare the data, especially a large dataset. 
 */
 
 /*merge2*/
@@ -326,8 +319,8 @@ list PROV1 if _merge==2
 list PROV1 if _merge==1 | _merge==2
 /*
 the reason for the non-merge is because there is different way to spell the name of
- province name between the master dataset and using dataset, such as Shannxi and 
- Shaanxi.
+province name between the master dataset and using dataset, such as Shannxi and 
+Shaanxi.
 */
 * Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
 
@@ -361,7 +354,9 @@ merge 1:m rural12 using healthwho, nogen
 list rural12 YEARIN if _merge==1
 list rural12 YEARIN if _merge==2
 * Data from WHO Study on Global AGEing and Adult Health 2007-2010 https://www.who.int/healthinfo/sage/en/.
-/* The data of rural variable come from two different year. One is from 2012, another is from 2014. I merge the data with rural14. The non-merge occur because of I did not merge the data with rural variable from 2012.*/
+/* The data of rural variable come from two different year. One is from 2012, another is from 2014. 
+I merge the data with rural14. The non-merge occur because of I did not merge the data with rural 
+variable from 2012.*/
 
 
 /********************/
@@ -382,7 +377,7 @@ the meanage14 variable. The result shows that 97 Han majority people live as lon
 la var meanage "mean elderly age"
 
 tab rural14
-//Shows the break down of the interviewee's geograpic location\\
+//Shows the break down of the interviewee's geograpic location
 tab age14
 //Gives break down of how many people are there by age. 
 
@@ -428,8 +423,8 @@ the Han (majority) elderly living in a rural area have a better health status
 than the minorities in an urban area--that is true as well but marginal differnce.
 The minorities elderly living in an urban area do not have a better self-health status than 
 those in a rural area- it is the opposite in which rural minority are doing better.
-Note the interpretation are purely based on graph and may be diffrent if we run regression. Also it is pertinent to 
-mention that frequency is diffrent for the rural and urban participant so it may
+Note the interpretation are purely based on graph and may be diffrent if we run regression. 
+Also it is pertinent to mention that frequency is diffrent for the rural and urban participant so it may
 have an impact on the mean of the variables. */
  
 graph bar (count), over(major14) blabel(bar) by(rural14, total)
@@ -504,14 +499,6 @@ histogram age14, normal
 twoway histogram age14 , discrete freq by(ethnic14)
 gr export graph14.png, replace  
 
-*twoway histogram function14 , discrete freq by(ethnic14)
-*gr export graph14.png, replace 
-*descrpitive 
-
-*twoway histogram function14 , discrete freq by(rural14)
-*gr export graph14.png, replace  
-*descriptive 
-
 tw(scatter rev_health14 age14)(lfit rev_health14 age14)
 /* the graphy tells us that the relationship between health and age is positive. In other words, 
 the elderly get a better health when they get older. It does not make sense. Let's change the code.
@@ -534,10 +521,6 @@ twoway (scatter rev_health14 familysize14) if familysize14<50
 
 histogram age14, discrete freq by( ethnic14 , total) 
 *check distribution of the data
-
-symplot age14 
-gr export graph18.png, replace  
-*dispersion of data below and above mean** 
 
 graph matrix rev_health14 age14, by(ethnic14, total)
 /* Self-reported health and validated age by ethinicity*/
@@ -648,8 +631,10 @@ enviornment than their counterparts in city. So they tends to become happier.
 gen logincome = log(income14) 
 save healthfinal.dta, replace
 gen income14_1 = income14/10000
-regress rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
-regress rev_health14 rural14 ethnic14 income14_1 education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
+regress rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 ///
+marital14 familysize14 sex14 age14,robust
+regress rev_health14 rural14 ethnic14 income14_1 education14 employment14 smoking14 ///
+marital14 familysize14 sex14 age14,robust
 * use log to make income value to be smaller, so we can observe the effect of income easily. 
 
 ///////////////////////////// Interaction ////////////////////////////////
@@ -666,54 +651,37 @@ ethnicity and elders’sociostructural positions to health may lead to a better 
 of social inequalities in health.
 */
 
-xi: regress rev_health14 i.Urban14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
-outreg2 using reg12.xls, replace
 
 xi: regress rev_health14 i.ethnic14 Urban14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14,robust
 outreg2 using reg13.doc, replace
 /* 
 As we stated in hypothesis, we expect to see that the Han (majority) elderly living have a better health status than the minorities.
-Regression table shows us that Zhuang minority group have worst health, compared to the majority. This is not surprise. However, it also 
-reveals that mongolia and other ethnic group have a better health than majority. This is out of our expectation. The data tells us that 
-some ethnic group do better than majority on health but some don't. We need to know the reason of that. 
+Regression table shows us that Zhuang minority group have worst health, compared to the majority. This is not surprise. However, it also reveals that mongolia and other ethnic group have a better health than majority. This is out of our expectation. The data tells us that some ethnic group do better than majority on health but some don't. We need to know the reason of that. 
 */
 
-
-reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14,allbaselevels
-outreg2 using reg20.doc, replace
-reg rev_health14 i.Urban14 i.ethnic14 Urban14#ethnic14,robust 
-* Interaction 1
-reg rev_health14 Urban14 i.ethnic14 Urban14#ethnic14 logincome education14 employment14 smoking14 marital14 sex14 familysize14 age14,robust 
+reg rev_health14 Urban14 i.ethnic14 Urban14#ethnic14 logincome education14 ///
+employment14 smoking14 marital14 sex14 familysize14 age14,robust 
 outreg2 using reg29.doc
-///question: how to interpre the interaction aboved? how to operationlize the geographic health disparity? A: the thing we are doing right now is good enough.
-/// how to use outreg2 command to control the column number?  A: the first line use replace but the second and later one use append.
-/// do I need to creat a variable that represent socioeconomic status of the elderly? A: not really.
-/// how to conbine the variable from 12 and variable from 14? use append?  A: use append, we will have weight column. 
-/// we can use the marginplot to see the effect of urban ana rural on health.
-/// we can also use "replace income14= income14/1000" or we can add beta after the regression line.
 
-
-/////////////////
 reg rev_health14 i.ethnic14##c.logincome, baselevels
 reg rev_health14 ethnic14 logincome i.ethnic14##c.logincome, robust
-reg rev_health14 ethnic14 logincome i.ethnic14##c.logincome i.ethnic14##c.education14 i.ethnic14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
-reg rev_health14 Urban14 logincome i.Urban14##c.logincome i.Urban14##c.education14 i.Urban14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
-outreg2 using reg20.doc,replace 
-
-reg rev_health14 major14 logincome i.major14##c.logincome i.major14##c.education14 i.major14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
-outreg2 using reg22.doc,replace
-
-/*compares to the income from the elderly living in the rural area,  one unit increase in the income from the elderly living in the urban area would cause a -1.01e-06 decrease in their health outcome.
+reg rev_health14 ethnic14 logincome i.ethnic14##c.logincome i.ethnic14##c.education14 ///
+ i.ethnic14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
+/* 
+We expected to see the urban/rural health disparity among the elderly. Here, we use income, education and  employment to measure health disparity. Using interaction between these variables, we can find that interaction effect of urban employment on health is significant, controled for other variables. In other words, ethnic health disparity do exist among elder population. It support our 
+hypothese that majority elderly have better health than minorities elderly.  
 */
-////////////////
 
-xi: regress function14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
-ovtest
+reg rev_health14 Urban14 logincome i.Urban14##c.logincome i.Urban14##c.education14 ///
+i.Urban14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
+outreg2 using reg21.doc,replace 
+/* we can know that the interaction between residence location and employment is statiscally
+significant. As we expected, eldely living in urban areas have better health status than 
+their rural counterparts. It seems that residence location do matter because it can affect  
+elderly's health. It also support our hypothese that urban elderly have better
+health condition thant elderly living in rural area.
+*/
 
-
-reg function14 i.rural14##c.logincome education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust beta
-
-* use the log for income variable to see the effect.
 
 // Marginsplot
 reg rev_health14 i.rural14##c.income14
@@ -733,7 +701,7 @@ margins ethnic14,  at(familysize14=(1(5)30))
 marginsplot, x(familysize14)
 
 /*
-According to the marginsplot
+According to the marginsplot,
 */
 
 // Regplot
@@ -799,16 +767,14 @@ reg rev_health14 Urban14
 predict Healthhat
 graph twoway (scatter rev_health14 Urban14 ) (line rev_health14 Urban14, sort)
 graph twoway (scatter rev_health14 Urban14) (lfit rev_health14 Urban14)
-reg rev_health14 Urban14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14
+reg rev_health14 Urban14 ethnic14 logincome education14 employment14 smoking14 ///
+marital14 familysize14 sex14
 rvfplot, yline(0)
 gr export g1.eps, replace
-
 estat hettest
 estat imtest
 estat szroeter, rhs
-//there is less heteroskedascity.
-
-
+//we can find that there is heteroskedascity in the regression model.
 
 
 /*****************/
