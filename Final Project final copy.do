@@ -1,6 +1,6 @@
-* Data Management Project- Problem Set 6
-* Shibin Yan & Sulman Saleem, Fall 2019
-* Revised: Fall 2019 Nov.14
+* Data Management Project- Final Project
+* Shibin Yan Sulman Saleem, Fall 2019
+* Revised: Fall 2019 Dec.14
 *----------------------------
 
 //---------------------------data mgmt----------------------------------------------
