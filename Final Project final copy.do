@@ -295,7 +295,23 @@ The reshape can help us easier to compare the data, especially a large dataset.
 */
 
 /*merge2*/
-use clhwave.dta,clear
+use "https://docs.google.com/uc?id=13lo_bsO5ur70VJiZXx6pNdY67AHVbLTH&export=download",clear
+keep ID MONTHIN DAYIN TYPE PROV age08 rural08 sex08 ethnic08 happiness08 marital08 born08 health08 income08 /// 
+employment08 education08 familysize08 smoking08 bathing08 dressing08 toileting08 transfer08 continen08 feeding08 visiting08 shopping08 cooking08 washing08 walking08 carrying08 
+merge 1:1 ID using clhwave,nogen
+save chclthr.dta,replace
+list ID TYPE if _merge==1
+list ID TYPE if _merge==2
+/*
+the reasons for the non-merge is that there are thousands of new observations added to 
+the using datasets, and that many observations appeared in the master dataset are not 
+longer appear in the using dataset. Maybe it is because the elderly died or the researchers
+cannot find these elderly for an interview again.  
+*/
+*/
+
+/*merge3*/
+use chclthr.dta,clear
 decode PROV, g(PROV1)
 replace PROV1 = proper(PROV1)
 save giant, replace
@@ -315,7 +331,7 @@ the reason for the non-merge is because there is different way to spell the name
 */
 * Data from China Statistical Yearbook 2018 http://www.stats.gov.cn/tjsj/ndsj/2018/indexeh.htm.
 
- /*merge3*/
+/*merge3*/
 use "https://docs.google.com/uc?id=1WMOXBRM8910rlTr3VV3uFCXPtuT5LRmC&export=download",clear
 keep if COUNTRY==1 | COUNTRY==10 | COUNTRY==22  
 keep COUNTRY RESIDENCE PROVINCE_CHNS AGE INCOME PPP GOODHEALTH BMI
@@ -326,7 +342,6 @@ collapse (mean) AGE , by(PROV1)
 save agemeg,replace
 /*Data from Research on Early Life and Aging Trends and Effects: A Cross-National 
 Study 1996-2008 https://www.icpsr.umich.edu/icpsrweb/DSDR/studies/34241.*/
-
 merge 1:m PROV1 using yearmge, nogen
 sort PROV1
 save healthwho, replace
@@ -334,6 +349,19 @@ save healthwho, replace
 /* A lot of non-merge happen in the using dataset because there are a lot of missing value of PROV1 variable in 
 the using dataset. */
 
+/*merge5*/
+use "https://docs.google.com/uc?id=1jrGlyM9tmOy9OtILTxuLnJhJuqgPdTvC&export=download",clear
+rename Q0104 rural12
+rename Q0811 educ
+recode educ (-8=.)
+egen averural=mean(educ), by(rural12)
+collapse educ, by(rural12)
+save chrural,replace
+merge 1:m rural12 using healthwho, nogen 
+list rural12 YEARIN if _merge==1
+list rural12 YEARIN if _merge==2
+* Data from WHO Study on Global AGEing and Adult Health 2007-2010 https://www.who.int/healthinfo/sage/en/.
+/* The data of rural variable come from two different year. One is from 2012, another is from 2014. I merge the data with rural14. The non-merge occur because of I did not merge the data with rural variable from 2012.*/
 
 
 /********************/
@@ -583,7 +611,7 @@ smoking and marital status have a statistical significant effect on functioning 
 relationship marital status and functioning capacity tend to have a better health! 
 */
 
-/// compare the health status of elderly from different areas to see how geographic location difference affect health.
+///compare the health status of elderly from different areas to see how geographic location difference affect health.
 xi: regress rev_health14 i.rural14 ethnic14 income14 education14 employment14 smoking14 marital14 familysize14 sex14,robust
 rename _Irural14_2 town
 rename _Irural14_3 rural
@@ -675,7 +703,8 @@ outreg2 using reg20.doc,replace
 reg rev_health14 major14 logincome i.major14##c.logincome i.major14##c.education14 i.major14##c.employment14 smoking14 marital14 sex14 familysize14 age14, robust
 outreg2 using reg22.doc,replace
 
-*compares to the income from the elderly living in the rural area,  one unit increase in the income from the elderly living in the urban area would cause a   -1.01e-06 decrease in their health outcome
+/*compares to the income from the elderly living in the rural area,  one unit increase in the income from the elderly living in the urban area would cause a -1.01e-06 decrease in their health outcome.
+*/
 ////////////////
 
 xi: regress function14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 i.ethnic14, robust
@@ -688,12 +717,24 @@ reg function14 i.rural14##c.logincome education14 employment14 smoking14 marital
 
 // Marginsplot
 reg rev_health14 i.rural14##c.income14
-margins rural14, at(income14=(1(100000)900000))
+margins rural14,  at(income14=(1(100000)900000))
 marginsplot, x(income14)
 
-reg rev_health14 i.rural14##c.familysize14,robust 
-margins rural14,at(familysize14=(1(5)20))
+reg rev_health14 i.Urban14##c.employment14
+margins Urban14,  at(employment14=(1(10)99))
+marginsplot, x(employment14)
+
+reg rev_health14 i.ethnic14##c.employment14
+margins ethnic14,  at(employment14=(1(5)30))
+marginsplot, x(employment14)
+
+reg rev_health14 i.ethnic14##c.familysize14 
+margins ethnic14,  at(familysize14=(1(5)30))
 marginsplot, x(familysize14)
+
+/*
+According to the marginsplot
+*/
 
 // Regplot
 reg rev_health14 i. ethnic14
@@ -707,10 +748,6 @@ regress rev_health14 age14 major14 ethage1
 regplot, by(major14)
 regplot, sep(major14)
 
-gen ethe = education14 * major14
-regress rev_health14 education14 major14 ethe
-regplot, by(major14)
-regplot, sep(major14)
 
 // Robust Check
 reg rev_health14 logincome , robust
@@ -812,6 +849,9 @@ outreg2 using reg5.xls, onecol bdec(2) st(coef) excel append ct(A8) lab
 reg rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg5.xls, onecol bdec(2) st(coef) excel append ct(A9) lab
+reg rev_health14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg6.xls, onecol bdec(2) st(coef) excel append ct(A10) lab
 
 *export model2
 use healthfinal, clear
@@ -843,6 +883,9 @@ outreg2 using reg6.xls, onecol bdec(2) st(coef) excel append ct(A8) lab
 reg function14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14
 /* *and outreg2 again but i append instead of replace */
 outreg2 using reg6.xls, onecol bdec(2) st(coef) excel append ct(A9) lab
+reg function14 rural14 ethnic14 logincome education14 employment14 smoking14 marital14 familysize14 sex14 age14
+/* *and outreg2 again but i append instead of replace */
+outreg2 using reg6.xls, onecol bdec(2) st(coef) excel append ct(A10) lab
 
 /////////////////////////////////////////END/////////////////////////////////////
 
